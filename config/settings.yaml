@@ -1,0 +1,40 @@
+fs:
+  data: data
+  target_dir: public/data
+  keys_file: public/data/keys.yaml
+  values_file: public/data/values.yaml
+mdm:
+  source_data:
+    id_key: id
+    source_system_key: source
+  uid_key: ean
+  constaints:
+    required:
+      - brand
+      - manufacturer_number
+      - product
+      - width
+      - height
+      - rim
+      - season
+    sufficient:
+      - [brand, manufacturer_number]
+  normalizer:
+    before_import:
+      - filter:
+          ##keys: []
+          ##values: []
+        action:
+          command: keys_to_lowercase
+          param1:
+      - filter:
+          keys: []
+          values: []
+        action:
+          command: values_to_uppercase
+          param1:
+    before_export:
+      - filter:
+        action:
+          command: normalize_keys
+          param1:
