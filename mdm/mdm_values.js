@@ -35,7 +35,17 @@ class MdmValues {
     }
     
     load() {
-	this.rules = yaml.safeLoad(fs.readFileSync(this.filename, "utf8"))
+	var self = this;
+	
+	fs.stat(this.filename, function(err, stats) { 
+	    if(err) {
+		console.log("cannot open filename " 
+			    + self.filename 
+			    + ". The error code is " + err.code);
+	    } else {
+		self.rules = yaml.safeLoad(fs.readFileSync(self.filename, "utf8"))
+	    }
+	});
     }
     
     add_value(key, value, action=null, param1=null) {

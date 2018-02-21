@@ -6,7 +6,7 @@ var router = express.Router();
     
 /* GET keys listing. */
 router.get('/', function(req, res, next) {
-    res.send(JSON.stringify(req.app.locals.Mdm.keys.keys));
+    res.send(JSON.stringify(req.app.locals.Mdm.keys));
 });
 
 router.post('/add/:value', function(req, res, next) {
