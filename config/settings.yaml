@@ -1,14 +1,15 @@
 fs:
-  data: data
-  target_dir: public/data
+  source_documents_directory: data/sources
+  normalized_documents_directory: data/normalized
+  export_directory: public/data
   keys_file: public/data/keys.yaml
   values_file: public/data/values.yaml
-mdm:
-  source_data:
+documents:
+  source_documents:
     id_key: id
-    source_system_key: source
-  uid_key: ean
+    system_key: source
   constaints:
+    uid_key: ean
     required:
       - brand
       - manufacturer_number
@@ -19,22 +20,22 @@ mdm:
       - season
     sufficient:
       - [brand, manufacturer_number]
-  normalizer:
-    before_import:
-      - filter:
-          ##keys: []
-          ##values: []
-        action:
-          command: keys_to_lowercase
-          param1:
-      - filter:
-          keys: []
-          values: []
-        action:
-          command: values_to_uppercase
-          param1:
-    before_export:
-      - filter:
-        action:
-          command: normalize_keys
-          param1:
+normalizer:
+  before_import:
+    - filter:
+      ##keys: []
+      ##values: []
+      action:
+        command: keys_to_lowercase
+        param1:
+    - filter:
+      keys: []
+      values: []
+      action:
+        command: values_to_uppercase
+        param1:
+  before_export:
+    - filter:
+      action:
+        command: normalize_keys
+        param1:

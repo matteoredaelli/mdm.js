@@ -18,149 +18,149 @@
 "use strict";
 
 class MdmDoc {
-    constructor(obj, settings) {
-	this.obj = obj;
-	this.settings = settings;
-    }
-    
-    save() {
-    }
-    
-    load() {
-    }
-    
-    add_key(key, value, action="do_not_overwrite") {
-	if (key in this.obj && action == "do_not_overwrite") {
-	    return;
-	}
-	this.obj[key] = value;
-    }
+  constructor(obj, settings) {
+    this.obj = obj;
+    this.settings = settings;
+  }
 
-    rename_key(key, new_key) {
-	if (key in this.obj) {
-	    this.obj[new_key] = this.obj[key];
-	    this.delete_key(key);
-	}
-    }
-    
-    delete_key(key) {
-	if (key in this.obj) {
-	    delete this.obj[key];
-	}
-    }
-    
-    empty() {
-	this.obj = {}
-    }
+  save() {
+  }
 
-    change_keys_case(target_case="lowercase") {
-	var self = this;
-	Object.keys(this.obj).forEach(function (key) {
-	    var k;
-	    var v = self.obj[key]
-	    switch (target_case.toLowerCase()) {
-	    case "lowercase":
-		k = key.toLowerCase();
-		break;
-	    default:
-		k = key.toUpperCase();
-	    }
-            if (k !== key) {
-		self.add_key(k, v);
-		self.delete_key(key);
-            }
-	} );
-    }
-    
-    change_values_case(target_case="lowercase") {
-	var obj = this.obj
-	Object.keys(obj).forEach(function (key) {
-            var v = obj[key];
-            if (v.constructor === String) {
-		switch (target_case.toLowerCase()) {
-		case "lowercase":
-                    v = v.toLowerCase();
-                    break;
-		default:
-                    v = v.toUpperCase();
-		}
-            }
-            obj[key] = v;
-	});
-	this.obj = obj;
-    };
+  load() {
+  }
 
-    normalize_keys(mdm) {
-	var self = this;
-	var mdm_keys = mdm.keys.rules;
-	console.debug(mdm_keys);
-	Object.keys(self.obj).forEach(function (key) {
-	    console.debug(key);
-	    if (key in mdm_keys) {
-		const action = mdm_keys[key]["action"]
-		switch (action) {
-		case "delete":
-		    self.delete_key(key);
-		    break;
-		case "rename":
-		    var param1 = mdm_keys[key]["param1"];
-		    self.rename_key(key, param1);
-		    break;
-		default:
-		    console.log("Normalize_keys: unknown action " + action)  
-		}
-	    }
-	});
+  add_key(key, value, action="do_not_overwrite") {
+    if (key in this.obj && action == "do_not_overwrite") {
+      return;
     }
-    
-    rename_values(mapping) {
-	var obj = this.obj;
-	Object.keys(obj).forEach(function (key) {
-	    var v = obj[key];
-	    if (v.constructor === String && v in mapping) {
-		obj[key] = mapping[v];
-	    }
-	});
-	this.obj = obj;
-    };
+    this.obj[key] = value;
+  }
 
-    normalize(mdm, step) {
-	var cmd = null;
-	var self = this;
-	self.settings.mdm.normalizer[step].forEach( function(f) {
-	    console.log(f);
-	    switch(f.action.command) {
-	    case "keys_to_uppercase":
-		cmd = 'self.change_keys_case("uppercase")';
-		break;
-	    case "keys_to_lowercase":
-		cmd = 'self.change_keys_case("lowercase")';
-		break;
-	    case "normalize_keys":
-		cmd = 'self.normalize_keys(mdm)';
-		break;
-		/*
-	    case "normalize_values":
-		cmd = 'self.normalize_values(mdm)';
-		break;
-		*/
-	    case "values_to_uppercase":
-		cmd = 'self.change_values_case("uppercase")';
-		break;
-	    case "values_to_lowercase":
-		cmd = 'self.change_values_case("lowercase")';
-		break;
-	    default:
-		console.log("Normalize: unknown command " + cmd)
-	    }
-	    console.log(cmd);
-	    if (cmd.constructor === String) {
-		eval(cmd);
-	    }
-	});
+  rename_key(key, new_key) {
+    if (key in this.obj) {
+      this.obj[new_key] = this.obj[key];
+      this.delete_key(key);
     }
-    
+  }
+
+  delete_key(key) {
+    if (key in this.obj) {
+      delete this.obj[key];
+    }
+  }
+
+  empty() {
+    this.obj = {}
+  }
+
+  change_keys_case(target_case="lowercase") {
+    var self = this;
+    Object.keys(this.obj).forEach(function (key) {
+      var k;
+      var v = self.obj[key]
+      switch (target_case.toLowerCase()) {
+        case "lowercase":
+        k = key.toLowerCase();
+        break;
+        default:
+        k = key.toUpperCase();
+      }
+      if (k !== key) {
+        self.add_key(k, v);
+        self.delete_key(key);
+      }
+    } );
+  }
+
+  change_values_case(target_case="lowercase") {
+    var obj = this.obj
+    Object.keys(obj).forEach(function (key) {
+      var v = obj[key];
+      if (v.constructor === String) {
+        switch (target_case.toLowerCase()) {
+          case "lowercase":
+          v = v.toLowerCase();
+          break;
+          default:
+          v = v.toUpperCase();
+        }
+      }
+      obj[key] = v;
+    });
+    this.obj = obj;
+  };
+
+  normalize_keys(mdm) {
+    var self = this;
+    var mdm_keys = mdm.keys.rules;
+    console.debug(mdm_keys);
+    Object.keys(self.obj).forEach(function (key) {
+      console.debug(key);
+      if (key in mdm_keys) {
+        const action = mdm_keys[key]["action"]
+        switch (action) {
+          case "delete":
+          self.delete_key(key);
+          break;
+          case "rename":
+          var param1 = mdm_keys[key]["param1"];
+          self.rename_key(key, param1);
+          break;
+          default:
+          console.log("Normalize_keys: unknown action " + action)
+        }
+      }
+    });
+  }
+
+  rename_values(mapping) {
+    var obj = this.obj;
+    Object.keys(obj).forEach(function (key) {
+      var v = obj[key];
+      if (v.constructor === String && v in mapping) {
+        obj[key] = mapping[v];
+      }
+    });
+    this.obj = obj;
+  };
+
+  normalize(mdm, step) {
+    var cmd = null;
+    var self = this;
+    self.settings.documents.normalizer[step].forEach( function(f) {
+      console.log(f);
+      switch(f.action.command) {
+        case "keys_to_uppercase":
+        cmd = 'self.change_keys_case("uppercase")';
+        break;
+        case "keys_to_lowercase":
+        cmd = 'self.change_keys_case("lowercase")';
+        break;
+        case "normalize_keys":
+        cmd = 'self.normalize_keys(mdm)';
+        break;
+        /*
+        case "normalize_values":
+        cmd = 'self.normalize_values(mdm)';
+        break;
+        */
+        case "values_to_uppercase":
+        cmd = 'self.change_values_case("uppercase")';
+        break;
+        case "values_to_lowercase":
+        cmd = 'self.change_values_case("lowercase")';
+        break;
+        default:
+        console.log("Normalize: unknown command " + cmd)
+      }
+      console.log(cmd);
+      if (cmd.constructor === String) {
+        eval(cmd);
+      }
+    });
+  }
+
 }
-					    
+
 
 module.exports = MdmDoc

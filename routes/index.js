@@ -27,11 +27,11 @@ router.get('/', function(req, res, next) {
 
 /* GET home page. */
 router.get('/ping', function(req, res, next) {
-    res.send("pong")
+  res.send("pong")
 });
 
 router.post('/test', function(req, res) {
-    res.send(req.body)
+  res.send(req.body)
 });
 
 module.exports = router;

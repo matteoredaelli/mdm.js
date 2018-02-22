@@ -20,30 +20,30 @@
 var express = require('express');
 var router = express.Router();
 
-    
+
 /* GET keys listing. */
 router.get('/', function(req, res, next) {
-    res.send(JSON.stringify(req.app.locals.Mdm.values));
+  res.send(JSON.stringify(req.app.locals.Mdm.values));
 });
 
 router.post('/add/:key/:value', function(req, res, next) {
-    req.app.locals.Mdm.values.add_value(req.params.key, req.params.value)
-    res.send('ok');
+  req.app.locals.Mdm.values.add_value(req.params.key, req.params.value)
+  res.send('ok');
 });
 
 router.post('/empty', function(req, res, next) {
-    req.app.locals.Mdm.values.empty();
-    res.send('ok');
+  req.app.locals.Mdm.values.empty();
+  res.send('ok');
 });
 
 router.post('/load', function(req, res, next) {
-    req.app.locals.Mdm.values.load()
-    res.send('ok');
+  req.app.locals.Mdm.values.load()
+  res.send('ok');
 });
 
 router.post('/save', function(req, res, next) {
-    req.app.locals.Mdm.values.save()
-    res.send('ok');
+  req.app.locals.Mdm.values.save()
+  res.send('ok');
 });
 
 module.exports = router;

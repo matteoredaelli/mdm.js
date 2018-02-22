@@ -21,52 +21,52 @@ const yaml = require('js-yaml');
 const fs   = require('fs');
 
 class MdmValues {
-    constructor(filename) {
-	this.rules = {}
-	this.filename = filename
+  constructor(filename) {
+    this.rules = {}
+    this.filename = filename
+  }
+
+  save() {
+    const result = yaml.dump(this.rules);
+    fs.writeFile(this.filename, result, 'utf-8', (err) => {
+      if (err) throw err;
+      console.log('The file has been saved!');
+    });
+  }
+
+  load() {
+    var self = this;
+
+    fs.stat(this.filename, function(err, stats) {
+      if(err) {
+        console.log("cannot open filename "
+        + self.filename
+        + ". The error code is " + err.code);
+      } else {
+        self.rules = yaml.safeLoad(fs.readFileSync(self.filename, "utf8"))
+      }
+    });
+  }
+
+  add_value(key, value, action=null, param1=null) {
+    if (!(key in this.rules)) {
+      this.rules[key] = {}
     }
-    
-    save() {
-	const result = yaml.dump(this.rules);
-	fs.writeFile(this.filename, result, 'utf-8', (err) => {
-	    if (err) throw err;
-	    console.log('The file has been saved!');
-	});
+    if (!(value in this.rules[key])) {
+      this.rules[key][value] = {action: action, param1: param1}
     }
-    
-    load() {
-	var self = this;
-	
-	fs.stat(this.filename, function(err, stats) { 
-	    if(err) {
-		console.log("cannot open filename " 
-			    + self.filename 
-			    + ". The error code is " + err.code);
-	    } else {
-		self.rules = yaml.safeLoad(fs.readFileSync(self.filename, "utf8"))
-	    }
-	});
+  }
+
+  remove_key(key) {
+    if (key in this.rules) {
+      delete this.rules[key];
     }
-    
-    add_value(key, value, action=null, param1=null) {
-	if (!(key in this.rules)) {
-	    this.rules[key] = {}
-	}
-	if (!(value in this.rules[key])) {
-	    this.rules[key][value] = {action: action, param1: param1}
-	}
-    }
-    
-    remove_key(key) {
-	if (key in this.rules) {
-	    delete this.rules[key];
-	}
-    }
-    
-    empty() {
-	this.rules = {}
-    }
-    
+  }
+
+  empty() {
+    this.rules = {}
+  }
+
 }
 
 module.exports = MdmValues
