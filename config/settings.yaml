@@ -1,15 +1,15 @@
 fs:
-  source_documents_directory: data/sources
-  normalized_documents_directory: data/normalized
-  export_directory: public/data
+  import: public/data/import
+  work: public/data/work
+  export: public/data
   keys_file: public/data/keys.yaml
   values_file: public/data/values.yaml
-documents:
-  source_documents:
+document:
+  import_keys:
     id_key: id
-    system_key: source
+    source_key: source
+  export_key: ean
   constaints:
-    uid_key: ean
     required:
       - brand
       - manufacturer_number
@@ -21,7 +21,7 @@ documents:
     sufficient:
       - [brand, manufacturer_number]
 normalizer:
-  before_import:
+  import:
     - filter:
       ##keys: []
       ##values: []
@@ -34,7 +34,7 @@ normalizer:
       action:
         command: values_to_uppercase
         param1:
-  before_export:
+  export:
     - filter:
       action:
         command: normalize_keys

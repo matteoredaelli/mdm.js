@@ -28,7 +28,7 @@ class MdmValues {
 
   save() {
     const result = yaml.dump(this.rules);
-    fs.writeFile(this.filename, result, 'utf-8', (err) => {
+    fs.writeFile(this.filename, result, (err) => {
       if (err) throw err;
       console.log('The file has been saved!');
     });
@@ -53,13 +53,13 @@ class MdmValues {
       this.rules[key] = {}
     }
     if (!(value in this.rules[key])) {
-      this.rules[key][value] = {action: action, param1: param1}
+	this.rules[key][value] = {action: action, param1: param1}
     }
   }
 
   remove_key(key) {
-    if (key in this.rules) {
-      delete this.rules[key];
+      if (key in this.rules) {
+	  delete this.rules[key];
     }
   }
 

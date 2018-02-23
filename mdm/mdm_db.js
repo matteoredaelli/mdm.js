@@ -17,25 +17,41 @@
 
 "use strict";
 
-var express = require('express');
-var router = express.Router();
+class MdmDB{
+  constructor(settings) {
+    this.index = settings.documents.document_type;
+    this.obj = obj;	this.settings = settings;
+  }
 
-var mdm_doc = require('../mdm/mdm_doc');
+  save_doc(type, id, doc) {
+    client.create({
+      index: this.index,
+      type: type,
+      id: id,
+      body: doc});
+    }, function (error, response) {
+      // ...
+    });
+  }
 
-router.post('/import', function(req, res, next) {
-  console.debug(req.body);
-  var doc = new mdm_doc(req.body, req.app.locals.Mdm.settings, 'import')
-  doc.normalize(req.app.locals.Mdm)
-  doc.update_keys(req.app.locals.Mdm.keys)
-  doc.save()
-  res.send("ok\n");
-});
+  get_doc(area, id) {
+    this.client.search({
+      index: this.index,
+      type: area,
+      body: {
+        query: {
+          match: {
+            _id: id
+          }
+        }
+      }
+    }).then(function (resp) {
+      return resp.hits.hits;
+    }, function (err) {
+      console.trace(err.message);
+    });
+  }
+}
 
-router.post('/normalize/:phase', function(req, res, next) {
-  console.trace(req.body);
-  var doc = new mdm_doc(req.body, req.app.locals.Mdm.settings, req.params.phase)
-  doc.normalize(req.app.locals.Mdm)
-  res.send(doc.obj);
-});
 
-module.exports = router;
+module.exports = MdmDb

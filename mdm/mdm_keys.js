@@ -3,7 +3,7 @@
 const yaml = require('js-yaml');
 const fs   = require('fs');
 
-class MdmRules {
+class MdmKeys {
   constructor(filename) {
     this.filename = filename
     this.rules = {}
@@ -11,7 +11,7 @@ class MdmRules {
 
   save() {
     const result = yaml.dump(this.rules);
-    fs.writeFile(this.filename, 'utf-8', (err) => {
+    fs.writeFile(this.filename, result, (err) => {
       if (err) throw err;
       console.log('The file has been saved!');
     });
@@ -49,4 +49,4 @@ class MdmRules {
 
 }
 
-module.exports = MdmRules
+module.exports = MdmKeys

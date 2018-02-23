@@ -17,16 +17,61 @@
 
 "use strict";
 
+const yaml = require('js-yaml');
+const fs   = require('fs');
+
 class MdmDoc {
-  constructor(obj, settings) {
+  /* step: import, work, export */
+  constructor(obj, settings, phase) {
     this.obj = obj;
     this.settings = settings;
+    this.phase = phase;
+
+  }
+
+  is_valid() {
+  }
+
+  get_id() {
+    return (this.phase === 'import') ?
+      this.obj[this.settings.document.import_keys.source_key] + '-' + this.obj[this.settings.document.import_keys.id_key] :
+      this.obj[this.settings.document.export_key];
+  }
+
+  get_filename(id = null) {
+      if (! id)
+        id = this.get_id()
+        return this.settings.fs[this.phase] + '/' + id;
+  }
+
+  update_keys(mdm_keys) {
+    var self = this;
+    Object.keys(this.obj).forEach(function (key) {
+      mdm_keys.add_key(key)
+    });
   }
 
   save() {
+    const filename = this.get_filename()
+    const result = yaml.dump(this.obj);
+    fs.writeFile(filename, result, (err) => {
+      if (err) throw err;
+        console.log('The file has been saved!');
+    });
   }
 
-  load() {
+  load(id) {
+    var self = this;
+    const filename = this.get_filename(id)
+    fs.stat(filename, function(err, stats) {
+      if(err) {
+        console.log("cannot open filename "
+        + filename
+        + ". The error code is " + err.code);
+      } else {
+        self.obj = yaml.safeLoad(fs.readFileSync(filename, "utf8"))
+      }
+    });
   }
 
   add_key(key, value, action="do_not_overwrite") {
@@ -100,14 +145,14 @@ class MdmDoc {
         const action = mdm_keys[key]["action"]
         switch (action) {
           case "delete":
-          self.delete_key(key);
-          break;
+            self.delete_key(key);
+            break;
           case "rename":
-          var param1 = mdm_keys[key]["param1"];
-          self.rename_key(key, param1);
-          break;
+            var param1 = mdm_keys[key]["param1"];
+            self.rename_key(key, param1);
+            break;
           default:
-          console.log("Normalize_keys: unknown action " + action)
+            console.log("Normalize_keys: unknown action " + action)
         }
       }
     });
@@ -124,10 +169,10 @@ class MdmDoc {
     this.obj = obj;
   };
 
-  normalize(mdm, step) {
+  normalize(mdm) {
     var cmd = null;
     var self = this;
-    self.settings.documents.normalizer[step].forEach( function(f) {
+    self.settings.normalizer[self.phase].forEach( function(f) {
       console.log(f);
       switch(f.action.command) {
         case "keys_to_uppercase":
@@ -161,6 +206,5 @@ class MdmDoc {
   }
 
 }
-
 
 module.exports = MdmDoc
