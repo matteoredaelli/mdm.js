@@ -20,7 +20,7 @@
 const yaml = require('js-yaml');
 const fs   = require('fs');
 
-class MdmValues {
+class DocumentValues {
   constructor(filename) {
     this.rules = {}
     this.filename = filename
@@ -69,4 +69,4 @@ class MdmValues {
 
 }
 
-module.exports = MdmValues
+module.exports = DocumentValues

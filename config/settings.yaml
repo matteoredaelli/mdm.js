@@ -1,41 +1,37 @@
+db:
+  host: localhost:9200
+  log: trace
+  index: mdm
 fs:
-  import: public/data/import
-  work: public/data/work
-  export: public/data
-  keys_file: public/data/keys.yaml
-  values_file: public/data/values.yaml
-document:
-  import_keys:
-    id_key: id
-    source_key: source
-  export_key: ean
-  constaints:
-    required:
-      - brand
-      - manufacturer_number
-      - product
-      - width
-      - height
-      - rim
-      - season
-    sufficient:
-      - [brand, manufacturer_number]
-normalizer:
+  data_directory: public/data
+  document_keys_file: keys.yaml
+  document_values_file: values.yaml
+steps:
   import:
-    - filter:
-      ##keys: []
-      ##values: []
-      action:
-        command: keys_to_lowercase
-        param1:
-    - filter:
-      keys: []
-      values: []
-      action:
-        command: values_to_uppercase
-        param1:
+    keys: [source,id]
+    rules:
+      - filter:
+        ##keys: []
+        ##values: []
+        action:
+          command: keys_with_only_letters_numbers_and_underscores2
+          param1:
+      - filter:
+        action:
+          command: keys_to_lowercase
+          param1:
+      - filter:
+          keys: [brand, product, size]
+          values: []
+        action:
+          command: values_to_uppercase
+          param1:
   export:
-    - filter:
-      action:
-        command: normalize_keys
-        param1:
+      unique_keys:
+        - [ean]
+        - [brand, manufacturer_number]
+      rules:
+        - filter:
+          action:
+            command: normalize_keys
+            param1:

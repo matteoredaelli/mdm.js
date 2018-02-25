@@ -3,7 +3,7 @@
 const yaml = require('js-yaml');
 const fs   = require('fs');
 
-class MdmKeys {
+class DocumentKeys {
   constructor(filename) {
     this.filename = filename
     this.rules = {}
@@ -37,6 +37,13 @@ class MdmKeys {
     }
   }
 
+  add_keys_from_document(doc) {
+    var self = this;
+    Object.keys(doc).forEach(function (key) {
+      self.add_key(key)
+    });
+  }
+
   remove_key(key) {
     if (key in this.rules) {
       delete this.rules[key];
@@ -49,4 +56,4 @@ class MdmKeys {
 
 }
 
-module.exports = MdmKeys
+module.exports = DocumentKeys

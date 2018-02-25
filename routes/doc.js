@@ -20,22 +20,18 @@
 var express = require('express');
 var router = express.Router();
 
-var mdm_doc = require('../mdm/mdm_doc');
+var obj_utils = require('../mdm/object_utils');
 
 router.post('/import', function(req, res, next) {
   console.debug(req.body);
-  var doc = new mdm_doc(req.body, req.app.locals.Mdm.settings, 'import')
-  doc.normalize(req.app.locals.Mdm)
-  doc.update_keys(req.app.locals.Mdm.keys)
-  doc.save()
+  req.app.locals.Mdm.import_document(req.body)
   res.send("ok\n");
 });
 
-router.post('/normalize/:phase', function(req, res, next) {
+router.post('/normalize/:step', function(req, res, next) {
   console.trace(req.body);
-  var doc = new mdm_doc(req.body, req.app.locals.Mdm.settings, req.params.phase)
-  doc.normalize(req.app.locals.Mdm)
-  res.send(doc.obj);
+  const obj = obj_utils.normalize(req.body, req.app.locals.Mdm.settings.steps[req.params.step])
+  res.send(obj);
 });
 
 module.exports = router;

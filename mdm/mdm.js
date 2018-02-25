@@ -17,14 +17,19 @@
 
 "use strict";
 
-var mdm_keys = require('./mdm_keys');
-var mdm_values = require('./mdm_values');
+var obj_utils = require('./object_utils');
+var mdm_keys = require('./document_keys');
+var mdm_values = require('./document_values');
+var mdm_db = require('./db');
+var fs = require('fs');
 
 class Mdm {
   constructor(settings) {
+    const path = settings.fs.data_directory;
     this.settings = settings
-    this.keys = new mdm_keys(settings.fs.keys_file)
-    this.values = new mdm_values(settings.fs.values_file)
+    this.keys = new mdm_keys(path + '/' + settings.fs.document_keys_file)
+    this.values = new mdm_values(path + '/' + settings.fs.document_values_file)
+    this.db = new mdm_db(settings.db)
     this.load()
   }
 
@@ -45,6 +50,28 @@ class Mdm {
     this.values.save()
   }
 
-}
+  import_document(doc) {
+    const obj = obj_utils.normalize(doc, this.settings.steps.import.rules)
+    this.keys.add_keys_from_document(obj)
+    this.db.save_doc("import", obj_utils.get_unique_key(obj), obj)
+  }
+
+  export_db() {
+    var self = this;
+    const target_step="export";
+    const path = self.settings.fs.import;
+    var doc = new mdm_doc(null, self.settings)
+
+    fs.readdir(path, function(err, items) {
+      for (var i=0; i<items.length; i++) {
+          let filename = items[i]
+          console.log(filename);
+          doc.load(filename, null, "import")
+          doc.normalize(self, target_step)
+          doc.save("export")
+        }
+      });
+    }
+  }
 
 module.exports = Mdm
