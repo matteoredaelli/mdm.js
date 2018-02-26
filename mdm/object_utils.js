@@ -45,37 +45,41 @@ exports.delete_key = function(obj, key) {
   return obj;
 }
 
-exports.change_keys_case = function(obj, target_case="lowercase") {
+exports.change_keys_case = function(obj, target_case="lowercase", filter) {
   Object.keys(obj).forEach(function (key) {
-    var k;
-    var v = obj[key]
-    switch (target_case.toLowerCase()) {
-      case "lowercase":
-      k = key.toLowerCase();
-      break;
-      default:
-      k = key.toUpperCase();
-    }
-    if (k !== key) {
-      obj = rename_key(obj, k, v);
+    if (filter.keys.length == 0 || key in filter.keys) {
+      var k;
+      var v = obj[key]
+      switch (target_case.toLowerCase()) {
+        case "lowercase":
+        k = key.toLowerCase();
+        break;
+        default:
+        k = key.toUpperCase();
+      }
+      if (k !== key) {
+        obj = rename_key(obj, k, v);
+      }
     }
   });
   return obj;
 }
 
-exports.change_values_case = function(obj, target_case="lowercase") {
+exports.change_values_case = function(obj, target_case="lowercase", filter) {
   Object.keys(obj).forEach(function (key) {
-    var v = obj[key];
-    if (v.constructor === String) {
-      switch (target_case.toLowerCase()) {
-        case "lowercase":
-        v = v.toLowerCase();
-        break;
-        default:
-        v = v.toUpperCase();
+    if (filter.keys.length == 0 || key in filter.keys) {
+      var v = obj[key];
+      if (v.constructor === String) {
+        switch (target_case.toLowerCase()) {
+          case "lowercase":
+          v = v.toLowerCase();
+          break;
+          default:
+          v = v.toUpperCase();
+        }
       }
+      obj[key] = v;
     }
-    obj[key] = v;
   });
   return obj;
 };
@@ -122,13 +126,16 @@ exports.rename_values = function(obj, mapping) {
 
 exports.normalize = function(obj, rules)  {
   rules.forEach( function(f) {
+    let keys = f.filter && f.filter.keys ? f.filter.keys : [];
+    let values = f.filter && f.filter.values ? f.filter.values : [];
+    let filter = {keys: keys, values: values};
     console.log(f);
     switch(f.action.command) {
       case "keys_to_uppercase":
-      obj = self.change_keys_case(obj, "uppercase");
+      obj = self.change_keys_case(obj, "uppercase", filter);
       break;
       case "keys_to_lowercase":
-      obj = self.change_keys_case(obj, "lowercase");
+      obj = self.change_keys_case(obj, "lowercase", filter);
       break;
       case "normalize_keys":
       obj = self.normalize_keys(obj, rules);
@@ -139,13 +146,13 @@ exports.normalize = function(obj, rules)  {
       break;
       */
       case "values_to_uppercase":
-      obj = self.change_values_case(obj, "uppercase");
+      obj = self.change_values_case(obj, "uppercase", filter);
       break;
       case "values_to_lowercase":
-      obj = self.change_values_case(obj, "lowercase");
+      obj = self.change_values_case(obj, "lowercase", filter);
       break;
       case "keys_with_only_letters_numbers_and_underscores":
-      obj = self.keys_with_only_letters_numbers_and_underscores(obj)
+      obj = self.keys_with_only_letters_numbers_and_underscores(obj, filter)
       break;
       default:
       console.log("Normalize: unknown command "+ f.action.command);

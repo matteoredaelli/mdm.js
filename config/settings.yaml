@@ -22,7 +22,7 @@ steps:
           param1:
       - filter:
           keys: [brand, product, size]
-          values: []
+          values:
         action:
           command: values_to_uppercase
           param1:

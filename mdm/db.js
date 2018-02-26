@@ -26,7 +26,7 @@ class DB{
       log: db.log
     });
     this.index = db.index;
-    
+
     this.ping();
     this.create_index(this.index);
   }
@@ -73,7 +73,7 @@ class DB{
   save_doc(doc_type, id, doc) {
     console.log('index=' + this.index + ', type=' + doc_type + ', id=' + id + ', doc=' + doc);
 
-    return this.client.create({
+    return this.client.index({
       index: this.index,
       type: doc_type,
       id: id,

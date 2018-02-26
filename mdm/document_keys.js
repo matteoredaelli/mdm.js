@@ -13,7 +13,7 @@ class DocumentKeys {
     const result = yaml.dump(this.rules);
     fs.writeFile(this.filename, result, (err) => {
       if (err) throw err;
-      console.log('The file has been saved!');
+      console.log(`The file ''${this.filename}'' has been saved!`);
     });
   }
 
@@ -34,6 +34,7 @@ class DocumentKeys {
   add_key(key, action=null, param1=null) {
     if (!(key in this.rules)) {
       this.rules[key] = {action: action, param1: param1}
+      this.save();
     }
   }
 
