@@ -14,14 +14,14 @@ steps:
         ##keys: []
         ##values: []
         action:
-          command: keys_with_only_letters_numbers_and_underscores2
+          command: keys_with_only_letters_numbers_and_underscores
           param1:
       - filter:
         action:
           command: keys_to_lowercase
           param1:
       - filter:
-          keys: [brand, product, size]
+          keys: [brand, product, description, size, vehicle, seasonality, label_fuel, label_noise, label_wet]
           values:
         action:
           command: values_to_uppercase

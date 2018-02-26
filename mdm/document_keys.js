@@ -33,7 +33,7 @@ class DocumentKeys {
 
   add_key(key, action=null, param1=null) {
     if (!(key in this.rules)) {
-      this.rules[key] = {action: action, param1: param1}
+      this.rules[key] = [{action: action, param1: param1}]
       this.save();
     }
   }

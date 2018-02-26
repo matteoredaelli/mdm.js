@@ -31,9 +31,10 @@ exports.add_key = function(obj, key, value, action="do_not_overwrite") {
 }
 
 exports.rename_key = function(obj, key, new_key) {
+  var self = this;
   if (key in obj) {
     obj[new_key] = obj[key];
-    obj.delete_key(key);
+    obj = self.delete_key(obj, key);
   }
   return obj
 }
@@ -46,6 +47,7 @@ exports.delete_key = function(obj, key) {
 }
 
 exports.change_keys_case = function(obj, target_case="lowercase", filter) {
+  var self = this;
   Object.keys(obj).forEach(function (key) {
     if (filter.keys.length == 0 || key in filter.keys) {
       var k;
@@ -58,7 +60,7 @@ exports.change_keys_case = function(obj, target_case="lowercase", filter) {
         k = key.toUpperCase();
       }
       if (k !== key) {
-        obj = rename_key(obj, k, v);
+        obj = self.rename_key(obj, k, v);
       }
     }
   });
@@ -85,26 +87,28 @@ exports.change_values_case = function(obj, target_case="lowercase", filter) {
 };
 
 exports.keys_with_only_letters_numbers_and_underscores = function(obj) {
+  var self = this;
   Object.keys(obj).forEach(function (key) {
-    new_key = key.replace(/[^a-z0-9_]+/gi, "");
+    let new_key = key.replace(/[^a-z0-9_]+/gi, "");
     if (key !== new_key)
-      obj = rename_key(obj, key, new_key)
+      obj = self.rename_key(obj, key, new_key)
   });
   return obj;
 };
 
 exports.normalize_keys = function(obj, rules) {
+  var self = this;
   Object.keys(obj).forEach(function (key) {
     console.debug(key);
     if (key in rules) {
       let  action = rules[key]["action"];
       switch (action) {
         case "delete":
-        obj = delete_key(obj, key);
+        obj = self.delete_key(obj, key);
         break;
         case "rename":
         const param1 = rules[key]["param1"];
-        obj = rename_key(obj, key, param1);
+        obj = self.rename_key(obj, key, param1);
         break;
         default:
         console.log("Normalize_keys: unknown action " + action)
