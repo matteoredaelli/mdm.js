@@ -50,8 +50,9 @@ class Mdm {
     this.values.save()
   }
 
-  import_document(doc) {
-    const obj = obj_utils.normalize(doc, this.settings.steps.import.rules)
+  import_document(obj) {
+    obj = obj_utils.normalize(obj, this.settings.steps.import.rules);
+    obj = obj_utils.normalize(obj, this.settings.steps.export.rules);
     this.keys.add_keys_from_document(obj)
     this.db.save_doc("import", obj_utils.get_unique_key(obj), obj)
   }

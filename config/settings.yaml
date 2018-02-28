@@ -10,28 +10,72 @@ steps:
   import:
     keys: [source,id]
     rules:
+      ## remove strange_characterts at the begin
       - filter:
-        ##keys: []
-        ##values: []
+          keys: /^[\s'"]+/i
         action:
-          command: keys_with_only_letters_numbers_and_underscores
-          param1:
+          command: keys_replace
+          param1: ''
+      ## remove strange_characterts at the end
+      - filter:
+          keys: /[\s'"]+$/i
+        action:
+          command: keys_replace
+          param1: ''
+      ## remove strange_characterts at the begin
+      - filter:
+          values: /^[\s'"]+/i
+        action:
+          command: values_replace
+          param1: ''
+      ## remove strange_characterts at the end
+      - filter:
+          values: /[\s'"]+$/i
+        action:
+          command: values_replace
+          param1: ''
       - filter:
         action:
           command: keys_to_lowercase
           param1:
       - filter:
-          keys: [brand, product, description, size, vehicle, seasonality, label_fuel, label_noise, label_wet]
+          keys: /brand|product|description|size|vehicle|seasonality|label_fuel|label_noise|label_wet/i
           values:
         action:
           command: values_to_uppercase
           param1:
+      - filter:
+          keys: /^taloudellisuus$/i
+        action:
+          command: keys_replace
+          param1: label_fuel
+      - filter:
+          keys: /^labelfuel$/i
+        action:
+          command: keys_replace
+          param1: label_fuel
+      - filter:
+          keys: /^vierintmelu$/i
+        action:
+          command: keys_replace
+          param1: label_noise
+      - filter:
+          keys: /^mrkpito$/i
+        action:
+          command: keys_replace
+          param1: label_wet
   export:
       unique_keys:
         - [ean]
         - [brand, manufacturer_number]
       rules:
         - filter:
+            values: /^(si|yes|true)$/i
           action:
-            command: normalize_keys
-            param1:
+            command: values_replace
+            param1: true
+        - filter:
+            values: /^(no|false)$/i
+          action:
+            command: values_replace
+            param1: false
