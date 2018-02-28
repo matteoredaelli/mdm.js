@@ -50,17 +50,17 @@ steps:
           command: keys_replace
           param1: label_fuel
       - filter:
-          keys: /^labelfuel$/i
+          keys: /^(labelfuel|label fuel)$/i
         action:
           command: keys_replace
           param1: label_fuel
       - filter:
-          keys: /^vierintmelu$/i
+          keys: /^vierintämelu$/i
         action:
           command: keys_replace
           param1: label_noise
       - filter:
-          keys: /^mrkpito$/i
+          keys: /^märkäpito$/i
         action:
           command: keys_replace
           param1: label_wet
@@ -79,3 +79,22 @@ steps:
           action:
             command: values_replace
             param1: false
+        - filter:
+            keys: /^brand$/i
+            values: /[-_]/i
+          action:
+            command: values_replace
+            param1: ' '
+        - filter:
+            keys: /^url|test$/i
+          action:
+            command: keys_delete
+            param1:
+        - filter:
+            keys: /^description$/i
+            values: /runflat/i
+          action:
+            command: key_add
+            param1: runflat
+            param2: true
+            #param3: true
