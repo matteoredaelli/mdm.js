@@ -43,11 +43,27 @@ exports.get_unique_key = function(obj) {
   return obj.source + '-' + obj.id;
 }
 
-exports.add_key = function(obj, key, value, overwrite=false) {
-  if (key in obj && overwrite)
-    return obj;
-  console.debug("      new_key: key= '" + key + "'");
-  obj[key] = value;
+exports.add_key = function(obj, key, value, policy="no_overwrite", sep=",") {
+  var new_value = this.convert_value_string(value);
+  switch (policy) {
+    case "overwrite":
+    obj[key] = new_value;
+    break;
+    case "append":
+    if (key in obj) {
+      obj[key] = obj[key] + sep + new_value
+    } else {
+      obj[key] = new_value
+    }
+    break;
+    case "no_overwrite_":
+    default:
+    if ((! (key in obj))) {
+      obj[key] = new_value
+    }
+    break;
+  }
+  console.debug('\x1b[33m%s\x1b[0m: ',"      new_key: key= '" + key + "'");
   return obj
 }
 
@@ -55,7 +71,7 @@ exports.rename_key = function(obj, key, new_key, overwrite=false) {
   var self = this;
   if (key in obj) {
     if (overwrite || (! (new_key in obj))) {
-      console.debug("      rename_key: key= '" + key +  "', new_key='" + new_key + "'");
+      console.debug('\x1b[33m%s\x1b[0m: ',"      rename_key: key= '" + key +  "', new_key='" + new_key + "'");
       obj[new_key] = obj[key];
     }
     obj = self.delete_key(obj, key);
@@ -65,7 +81,7 @@ exports.rename_key = function(obj, key, new_key, overwrite=false) {
 
 exports.delete_key = function(obj, key) {
   if (key in obj) {
-    console.debug("      delete_key: key= '" + key + "'");
+    console.debug('\x1b[33m%s\x1b[0m: ',"      delete_key: key= '" + key + "'");
     delete obj[key];
   }
   return obj;
@@ -84,7 +100,7 @@ exports.change_keys_case = function(obj, target_case="lowercase", filter) {
         new_key = key.toUpperCase();
       }
       if (new_key !== key) {
-        console.debug("      change_keys_case: key= '" + key +  "', new_key='" + new_key + "'");
+        console.debug('\x1b[33m%s\x1b[0m: ',"      change_keys_case: key= '" + key +  "', new_key='" + new_key + "'");
         obj = self.rename_key(obj, key, new_key);
       }
     }
@@ -107,7 +123,7 @@ exports.change_values_case = function(obj, target_case="lowercase", filter) {
         }
       }
       if (v !== new_value) {
-        console.debug("...   change_values_case: key= '" + key + "', old value='" + v + "', new_value='" + new_value + "'");
+        console.debug('\x1b[33m%s\x1b[0m: ',"...   change_values_case: key= '" + key + "', old value='" + v + "', new_value='" + new_value + "'");
         obj[key] = new_value;
       }
     }
@@ -128,24 +144,21 @@ exports.keys_with_only_letters_numbers_and_underscores = function(obj) {
 exports.keys_delete = function(obj, filter) {
   Object.keys(obj).forEach(function (key) {
     if ( (!filter.keys || key.match(filter.keys))) {
-      console.debug("      keys_delete: key= '" + key + "'");
+      console.debug('\x1b[33m%s\x1b[0m: ',"      keys_delete: key= '" + key + "'");
       obj = self.delete_key(obj, key)
     }
   });
   return obj;
 };
 
-exports.key_add = function(obj, filter, new_key, value, overwrite=false) {
+//policy: overwrite|append,no_overwrite
+exports.key_add = function(obj, filter, new_key, value, policy="no_overwrite", sep=",") {
   var self = this;
-  var new_value = self.convert_value_string(value);
-
   Object.keys(obj).forEach(function (key) {
     var v = obj[key];
     if ( (!filter.keys || key.match(filter.keys)) &&
      (!filter.values || v.match(filter.values))) {
-       if (overwrite || (! (new_key in obj))) {
-         obj = self.add_key(obj, new_key, new_value)
-       }
+       obj = self.add_key(obj, new_key, value, policy, sep)
      }
   });
   return obj;
@@ -168,7 +181,7 @@ exports.keys_replace = function(obj, filter, value) {
          break;
         default:
          let new_key = key.replace(filter.values, new_value)
-         console.debug("......keys_replace: old_key= '" + key + "', new_key='" + new_key + "'");
+         console.debug('\x1b[33m%s\x1b[0m: ',"......keys_replace: old_key= '" + key + "', new_key='" + new_key + "'");
          obj = self.rename_key(obj, key, new_key)
          break;
        }
@@ -177,7 +190,7 @@ exports.keys_replace = function(obj, filter, value) {
   return obj;
 };
 
-exports.values_replace = function(obj, filter, new_value) {
+exports.values_replace = function(obj, filter, new_value, replace_all_string=false) {
   Object.keys(obj).forEach(function (key) {
     var v = obj[key];
     if (!v || v.constructor !== String)
@@ -196,8 +209,8 @@ exports.values_replace = function(obj, filter, new_value) {
          obj[key] = null
          break;
          default:
-         obj[key] = v.replace(filter.values, new_value)
-         console.debug("......values_replace: key= '" + key + "', old value='" + v + "', new_value='" + obj[key] + "'");
+         obj[key] = replace_all_string ? new_value : v.replace(filter.values, new_value)
+         console.debug('\x1b[33m%s\x1b[0m: ',"......values_replace: key= '" + key + "', old value='" + v + "', new_value='" + obj[key] + "'");
          break;
        }
      }
@@ -211,8 +224,8 @@ exports.normalize = function(obj, rules)  {
     let keys = f.filter && f.filter.keys ? eval(f.filter.keys) : /^.*$/;
     let values = f.filter && f.filter.values ? eval(f.filter.values) : /^.*$/;
     let filter = {keys: keys, values: values};
-    console.debug("Normalize: entering new rule='" + f.action.command + "' with filters: keys='" + keys + "', values='" + values);
-        console.debug("  before the document has " + Object.keys(obj).length + ' keys');
+    console.debug('\x1b[33m%s\x1b[0m: ',"Normalize: entering new rule='" + f.action.command + "' with filters: keys='" + keys + "', values='" + values);
+        console.debug('\x1b[33m%s\x1b[0m: ',"  before the document has " + Object.keys(obj).length + ' keys');
     switch(f.action.command) {
       case "key_add":
       obj = self.key_add(obj, filter, f.action.param1, f.action.param2, f.action.param3);
@@ -230,7 +243,7 @@ exports.normalize = function(obj, rules)  {
       obj = self.keys_replace(obj, filter, f.action.param1);
       break;
       case "values_replace":
-      obj = self.values_replace(obj, filter, f.action.param1);
+      obj = self.values_replace(obj, filter, f.action.param1, f.action.param2);
       break;
       case "values_to_uppercase":
       obj = self.change_values_case(obj, "uppercase", filter);
@@ -244,7 +257,7 @@ exports.normalize = function(obj, rules)  {
       default:
       console.log("   unknown command "+ f.action.command);
     } // end switch
-    console.debug("   after the document has " + Object.keys(obj).length + ' keys');
+    console.debug('\x1b[33m%s\x1b[0m: ',"   after the document has " + Object.keys(obj).length + ' keys');
   });
 
   return obj;

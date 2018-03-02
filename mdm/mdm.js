@@ -29,7 +29,7 @@ class Mdm {
     this.settings = settings
     this.keys = new mdm_keys(path + '/' + settings.fs.document_keys_file)
     this.values = new mdm_values(path + '/' + settings.fs.document_values_file)
-    this.db = new mdm_db(settings.db)
+    this.db = new mdm_db(path)
     this.load()
   }
 
@@ -50,24 +50,39 @@ class Mdm {
     this.values.save()
   }
 
-  import_document(obj) {
-    obj = obj_utils.normalize(obj, this.settings.steps.import.rules);
-    obj = obj_utils.normalize(obj, this.settings.steps.export.rules);
-    this.keys.add_keys_from_document(obj)
-    this.db.save_doc("import", obj_utils.get_unique_key(obj), obj)
+  get_document_id(doc, step) {
+    const nokey = "__NOKEY__";
+    const keys = this.settings.steps[step].keys[0];
+    const map = keys.map(x => x in doc ? doc[x] : nokey);
+    const id = map.includes(nokey) ? null : map.join('-');
+    return id;
   }
 
-  export_db() {
+  import_document(obj, step) {
+    obj = obj_utils.normalize(obj, this.settings.steps[step].rules)
+    this.keys.add_keys_from_document(obj)
+    const import_id = this.get_document_id(obj, "import")
+    const id = this.get_document_id(obj, step)
+    if (id) {
+      this.db.save_obj(step, id, obj, import_id)
+    } else {
+      log.error("Step " + step + ": missing keys in doc " + obj)
+    }
+    return obj;
+  }
+
+
+  merge_documents() {
     var self = this;
-    const target_step="export";
-    const path = self.settings.fs.import;
-    var doc = new mdm_doc(null, self.settings)
+    const from_step   = "import";
+    const target_step = "work";
+    const path = self.db.path + '/import';
 
     fs.readdir(path, function(err, items) {
       for (var i=0; i<items.length; i++) {
           let filename = items[i]
           console.log(filename);
-          doc.load(filename, null, "import")
+          doc = db.load(filename, null, "import")
           doc.normalize(self, target_step)
           doc.save("export")
         }

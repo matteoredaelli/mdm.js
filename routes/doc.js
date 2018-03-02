@@ -23,9 +23,10 @@ var router = express.Router();
 var obj_utils = require('../mdm/object_utils');
 
 router.post('/import', function(req, res, next) {
-  console.debug(req.body);
-  req.app.locals.Mdm.import_document(req.body)
-  res.send("ok\n");
+  console.debug('\x1b[33m%s\x1b[0m: ',req.body);
+  var obj = req.app.locals.Mdm.import_document(req.body, "import")
+  var obj = req.app.locals.Mdm.import_document(req.body, "merging")
+  res.send(obj);
 });
 
 router.post('/normalize/:step', function(req, res, next) {

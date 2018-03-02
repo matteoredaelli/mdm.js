@@ -16,88 +16,65 @@
 */
 
 "use strict";
-
-var elasticsearch = require('elasticsearch');
+const yaml = require('js-yaml');
+const fs   = require('fs');
 
 class DB{
-  constructor(db) {
-    this.client = new elasticsearch.Client({
-      host: db.host,
-      log: db.log
-    });
-    this.index = db.index;
-
-    this.ping();
-    this.create_index(this.index);
+  constructor(path) {
+    this.path = path;
+    fs.existsSync(path) || fs.mkdirSync(path);
   }
 
-  ping(timeout = 3000) {
-    this.client.ping({
-      requestTimeout: timeout,
-    }, function (error) {
-      if (error) {
-        console.error('elasticsearch cluster is down!');
-      } else {
-        console.log('elasticsearch cluster is up');
+  get_filename(doc_type, id) {
+    const doc_path = this.path + "/" + doc_type;
+    const filename = doc_path + '/' + id.replace("/","") + '.yaml';
+
+    fs.existsSync(doc_path) || fs.mkdirSync(doc_path);
+    return filename;
+  }
+
+  save_raw(doc_type, id, doc) {
+    const filename = this.get_filename(doc_type, id);
+    const result = yaml.dump(doc);
+
+    fs.writeFile(filename, result, (err) => {
+      if (err) {
+        console.error('Cannot save document. type=' + doc_type + ', id=' + id + ', doc=' + doc);
+        throw err;
       }
+      console.log('Saved document. type=' + doc_type + ', id=' + id + ', doc=' + doc);
     });
   }
 
-  create_index(index) {
-    this.client.indices.create({
-      index: this.index,
-      ignore: true
-    }).then(function (body) {
-      // since we told the client to ignore 404 errors, the
-      // promise is resolved even if the index does not exist
-      console.log('index was (eventually) created');
-    } , function (error) {
-    // oh no!
-      console.error('index was (eventually) created');
-    });
-  }
-
-  delete_index(index) {
-    this.client.indices.delete({
-      index: this.index,
-      ignore: [404]
-    }).then(function (body) {
-      // since we told the client to ignore 404 errors, the
-      // promise is resolved even if the index does not exist
-      console.log('index was deleted or never existed');
-    } , function (error) {
-    // oh no!
-    });
-  }
-
-  save_doc(doc_type, id, doc) {
-    console.log('index=' + this.index + ', type=' + doc_type + ', id=' + id + ', doc=' + doc);
-
-    return this.client.index({
-      index: this.index,
-      type: doc_type,
-      id: id,
-      body: doc})
+  load_raw(doc_type, id) {
+    var self = this;
+    var obj = {};
+    const filename = this.get_filename(doc_type, id);
+    if (fs.statSync(filename).isFile()) {
+      console.debug("loading document from file "
+          + filename);
+      obj =  yaml.safeLoad(fs.readFileSync(filename, "utf8"))
+    } else {
+        console.error("cannot open document from file "
+          + filename);
     }
-
-  get_doc(doc_type, id) {
-    this.client.search({
-      index: this.index,
-      type: doc_type,
-      body: {
-        query: {
-          match: {
-            _id: id
-          }
-        }
-      }
-    }).then(function (resp) {
-      return resp.hits.hits;
-    }, function (err) {
-      console.trace(err.message);
-    });
+    return obj;
   }
+
+  save_obj(doc_type, id, doc, import_id) {
+    var raw = this.load_raw(doc_type, id);
+    console.log(raw);
+    if (! raw) {
+      raw = {}
+    };
+    raw[import_id] = doc;
+    return this.save_raw(doc_type, id, raw)
+  }
+
+  load_obj(doc_type, id) {
+    var raw = this.load_raw(doc_type, id);
+    return raw.includes(id) ? raw[id] : {}
+  }
+
 }
-
-
 module.exports = DB

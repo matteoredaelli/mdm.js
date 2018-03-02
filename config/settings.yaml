@@ -1,3 +1,7 @@
+audit:
+  - [ean]
+  - [brand, product]
+  - [width, series, rim]
 db:
   host: localhost:9200
   log: trace
@@ -8,7 +12,8 @@ fs:
   document_values_file: values.yaml
 steps:
   import:
-    keys: [source,id]
+    keys:
+      - [source,id]
     rules:
       ## remove strange_characterts at the begin
       - filter:
@@ -39,12 +44,6 @@ steps:
           command: keys_to_lowercase
           param1:
       - filter:
-          keys: /brand|product|description|size|vehicle|seasonality|label_fuel|label_noise|label_wet/i
-          values:
-        action:
-          command: values_to_uppercase
-          param1:
-      - filter:
           keys: /^taloudellisuus$/i
         action:
           command: keys_replace
@@ -64,8 +63,64 @@ steps:
         action:
           command: keys_replace
           param1: label_wet
-  export:
-      unique_keys:
+      - filter:
+          keys: /^indice di velocità$/i
+        action:
+          command: keys_replace
+          param1: speed_index
+      - filter:
+          keys: /^indice di portanza$/i
+        action:
+          command: keys_replace
+          param1: load_index
+      - filter:
+          keys: /^stagione|season$/i
+        action:
+          command: keys_replace
+          param1: seasonality
+      - filter:
+          keys: /^tipo|type$/i
+        action:
+          command: keys_replace
+          param1: vehicle
+      - filter:
+          keys: /^protezione del cerchio$/i
+        action:
+          command: keys_replace
+          param1: mfs
+      - filter:
+          keys: /^pneumatici runflat$/i
+        action:
+          command: keys_replace
+          param1: runflat
+      - filter:
+          keys: /^pneumatici chiodati$/i
+        action:
+          command: keys_replace
+          param1: studded
+      - filter:
+          keys: /^diametro|diameter$/i
+        action:
+          command: keys_replace
+          param1: rim
+      - filter:
+          keys: /^larghezza$/i
+        action:
+          command: keys_replace
+          param1: width
+      - filter:
+          keys: /^altezza$/i
+        action:
+          command: keys_replace
+          param1: series
+      - filter:
+          keys: /brand|product|description|size|vehicle|seasonality|label_fuel|label_noise|label_wet|type|speed_index/i
+          values:
+        action:
+          command: values_to_uppercase
+          param1:
+  merging:
+      keys:
         - [ean]
         - [brand, manufacturer_number]
       rules:
@@ -86,15 +141,122 @@ steps:
             command: values_replace
             param1: ' '
         - filter:
+            keys: /^label_noise$/i
+            values: / ?db$/i
+          action:
+            command: values_replace
+            param1: ''
+        - filter:
+            keys: /^seasonality$/i
+            values: /WINTER|INVERNAL|M\+S|SNOW|KITKARENGAS|NASTARENGAS/i
+          action:
+            command: values_replace
+            param1: WINTER
+            param2: true # replace_all string
+        - filter:
+            keys: /^seasonality$/i
+            values: /SUMMER|ESTIV|KESÄRENGAS/i
+          action:
+            command: values_replace
+            param1: SUMMER
+            param2: true # replace_all string
+        - filter:
+            keys: /^seasonality$/i
+            values: /SEASON|STAGIONI|4MEVSIM|JOKASÄÄNRENGAS/i
+          action:
+            command: values_replace
+            param1: SUMMER
+            param2: true # replace_all string
+        - filter:
+            keys: /^vehicle$/i
+            values: /^auto|PKW|PA$/i
+          action:
+            command: values_replace
+            param1: CAR
+        - filter:
+            keys: /^vehicle$/i
+            values: /^HA$/i
+          action:
+            command: values_replace
+            param1: VAN
+        - filter:
+            keys: /^vehicle$/i
+            values: /^4x4$/i
+          action:
+            command: values_replace
+            param1: SUV
+        - filter:
             keys: /^url|test$/i
           action:
             command: keys_delete
             param1:
         - filter:
             keys: /^description$/i
-            values: /runflat/i
+            values: /MFS|FSL|PROTEZIONE/i
+          action:
+            command: key_add
+            param1: mfs
+            param2: true
+        - filter:
+            keys: /^description$/i
+            values: / DSST|EMT|HRFS|MOExtended|PAX|RUNFLAT|R-F|RFT|ROF|SSR|(RUN FLAT)|TRF|ZRP|ZP|ZPS/i
           action:
             command: key_add
             param1: runflat
             param2: true
-            #param3: true
+        - filter:
+            keys: /^description$/i
+            values: / (SIL|ACO|ACOUSTIC|NST|SOUND|SILENT)/i
+          action:
+            command: key_add
+            param1: ncs
+            param2: true
+        - filter:
+            keys: /^description$/i
+            values: /winter/i
+          action:
+            command: key_add
+            param1: seasonality
+            param2: winter
+        - filter:
+            keys: /^description$/i
+            values: / (s-i|sealing|cs)/i
+          action:
+            command: key_add
+            param1: seal_inside
+            param2: true
+        - filter:
+            keys: /^description$/i
+            values: /studded|chiodat|NASTARENGAS|SPIKE/i
+          action:
+            command: key_add
+            param1: studded
+            param2: true
+        - filter:
+            keys: /^description$/i
+            values: /studdable|chiodabil/i
+          action:
+            command: key_add
+            param1: studdable
+            param2: true
+        - filter:
+            keys: /^description$/i
+            values: / ?(MOE|N0|N1|MO|AO|RO\d|NH|MCLAREN|LRO|F0\d|\*)/i
+          action:
+            command: key_add
+            param1: oe_marks
+            param2: true
+        - filter:
+            keys: /^price$/i
+            values: /\$/i
+          action:
+            command: key_add
+            param1: currency
+            param2: USD
+        - filter:
+            keys: /^price$/i
+            values: /€/i
+          action:
+            command: key_add
+            param1: currency
+            param2: EUR
