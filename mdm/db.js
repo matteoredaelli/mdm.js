@@ -50,7 +50,7 @@ class DB{
     var self = this;
     var obj = {};
     const filename = this.get_filename(doc_type, id);
-    if (fs.statSync(filename).isFile()) {
+    if (fs.existsSync(filename)) {
       console.debug("loading document from file "
           + filename);
       obj =  yaml.safeLoad(fs.readFileSync(filename, "utf8"))
