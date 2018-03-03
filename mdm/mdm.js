@@ -29,7 +29,11 @@ class Mdm {
     this.settings = settings
     this.keys = new mdm_keys(path + '/' + settings.fs.document_keys_file)
     this.values = new mdm_values(path + '/' + settings.fs.document_values_file)
-    this.db = new mdm_db(path)
+    //const reducer = (accumulator, currentValue) => accumulator[currentValue] = new mdm_db(path, currentValue);
+    this.db = {
+      "import": new mdm_db(path, "import"),
+      "merging": new mdm_db(path, "merging")}
+    console.log(Object.keys(this.db))
     this.load()
   }
 
@@ -64,7 +68,7 @@ class Mdm {
     const import_id = this.get_document_id(obj, "import")
     const id = this.get_document_id(obj, step)
     if (id) {
-      this.db.save_obj(step, id, obj, import_id)
+      this.db[step].save_obj(id, obj, import_id)
     } else {
       log.error("Step " + step + ": missing keys in doc " + obj)
     }

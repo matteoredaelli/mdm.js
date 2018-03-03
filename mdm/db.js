@@ -16,63 +16,55 @@
 */
 
 "use strict";
-const yaml = require('js-yaml');
-const fs   = require('fs');
+
+const level = require('level')
+var fs = require('fs')
+
+//db.put('example', {"a": 42}, function (err) {
+
+
+//})
 
 class DB{
-  constructor(path) {
+  constructor(path, dbname) {
     this.path = path;
+    this.dbname = dbname;
     fs.existsSync(path) || fs.mkdirSync(path);
+    this.db = level(path + "/" + dbname, { valueEncoding: 'json' })
   }
 
-  get_filename(doc_type, id) {
-    const doc_path = this.path + "/" + doc_type;
-    const filename = doc_path + '/' + id.replace("/","") + '.yaml';
-
-    fs.existsSync(doc_path) || fs.mkdirSync(doc_path);
-    return filename;
-  }
-
-  save_raw(doc_type, id, doc) {
-    const filename = this.get_filename(doc_type, id);
-    const result = yaml.dump(doc);
-
-    fs.writeFile(filename, result, (err) => {
+  save_raw(id, doc) {
+    console.debug("DB <" + this.dbname + ">: saving document id=<"  + id)
+    this.db.put(id, doc, function (err)  {
       if (err) {
-        console.error('Cannot save document. type=' + doc_type + ', id=' + id + ', doc=' + doc);
+        console.error('Cannot save document due to err=' + err + ', doc=' + doc);
         throw err;
       }
-      console.log('Saved document. type=' + doc_type + ', id=' + id + ', doc=' + doc);
     });
   }
 
-  load_raw(doc_type, id) {
-    var self = this;
-    var obj = {};
-    const filename = this.get_filename(doc_type, id);
-    if (fs.existsSync(filename)) {
-      console.debug("loading document from file "
-          + filename);
-      obj =  yaml.safeLoad(fs.readFileSync(filename, "utf8"))
-    } else {
-        console.error("cannot open document from file "
-          + filename);
-    }
-    return obj;
+  load_raw(id) {
+    this.db.get(id)
+    .then(function (value) {
+      console.log(value)
+      return value})
+    .catch(function (err) {
+      console.error(err)
+      return {} })
   }
 
-  save_obj(doc_type, id, doc, import_id) {
-    var raw = this.load_raw(doc_type, id);
+  save_obj(id, doc, import_id) {
+    var raw = this.load_raw(id);
     console.log(raw);
     if (! raw) {
       raw = {}
     };
     raw[import_id] = doc;
-    return this.save_raw(doc_type, id, raw)
+    return this.save_raw(id, raw)
   }
 
-  load_obj(doc_type, id) {
-    var raw = this.load_raw(doc_type, id);
+  load_obj(id) {
+    var raw = this.load_raw(id);
     return raw.includes(id) ? raw[id] : {}
   }
 

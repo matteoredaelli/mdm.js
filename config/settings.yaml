@@ -2,10 +2,6 @@ audit:
   - [ean]
   - [brand, product]
   - [width, series, rim]
-db:
-  host: localhost:9200
-  log: trace
-  index: mdm
 fs:
   data_directory: public/data
   document_keys_file: keys.yaml
