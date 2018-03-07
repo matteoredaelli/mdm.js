@@ -34,7 +34,7 @@ class DB{
   }
 
   save_raw(id, doc) {
-    console.debug("DB <" + this.dbname + ">: saving document id=<"  + id)
+    console.debug("DB <" + this.dbname + ">: save_raw with id=<"  + id)
     this.db.put(id, doc, function (err)  {
       if (err) {
         console.error('Cannot save document due to err=' + err + ', doc=' + doc);
@@ -44,28 +44,40 @@ class DB{
   }
 
   load_raw(id) {
-    this.db.get(id)
-    .then(function (value) {
-      console.log(value)
-      return value})
-    .catch(function (err) {
-      console.error(err)
-      return {} })
+    console.debug("DB <" + this.dbname + "> load_raw: with id=" + id)
+    // this.db.get(id)
+    // .then(function (value) {
+    //   console.debug(value)
+    //   return value})
+    // .catch(function (err) {
+    //   console.error(err)
+    //   return {} })
+
+    return this.db.get(id);
+      //.then(function (value) { callback(value) })
+      //.catch(function (err) { console.error(err) })
   }
 
+
   save_obj(id, doc, import_id) {
-    var raw = this.load_raw(id);
-    console.log(raw);
-    if (! raw) {
-      raw = {}
-    };
-    raw[import_id] = doc;
-    return this.save_raw(id, raw)
+    var self = this
+    console.debug("DB <" + self.dbname + "> save_obj: with id=" + id + ' and import_id=' + import_id)
+    return this.db.get(id)
+      .then(function (obj) {
+        console.log("DB <" + self.dbname + "> save_obj: retreived object ")
+        console.log(obj)
+        if (! obj) {
+          obj = {}
+        };
+        obj[import_id] = doc;
+        return self.save_raw(id, obj)
+      })
+      .catch(function (err) { console.error(err) })
   }
 
   load_obj(id) {
-    var raw = this.load_raw(id);
-    return raw.includes(id) ? raw[id] : {}
+    console.debug("DB <" + this.dbname + "> Load_obj: with id=" + id)
+    return this.load_raw(id);
   }
 
 }

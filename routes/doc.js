@@ -22,10 +22,20 @@ var router = express.Router();
 
 var obj_utils = require('../mdm/object_utils');
 
-router.post('/import', function(req, res, next) {
-  console.debug('\x1b[33m%s\x1b[0m: ',req.body);
-  var obj = req.app.locals.Mdm.import_document(req.body, "import")
-  //var obj = req.app.locals.Mdm.import_document(req.body, "merging")
+router.get('/:id/:step', function(req, res, next) {
+  console.debug('\x1b[33m%s\x1b[0m: ', 'getting id=' + req.params.id + ' for step=' + req.params.step);
+  //obj = req.app.locals.Mdm.import_document(obj, "import")
+  req.app.locals.Mdm.db[req.params.step].load_obj(req.params.id)
+    .then(function (obj) {  console.log(obj); res.send(obj);} )
+    .catch(function (err) { console.error(err); res.send({}); });
+});
+
+router.post('/save/:step', function(req, res, next) {
+  var obj = req.body
+  console.debug('\x1b[33m%s\x1b[0m: ', obj);
+  //obj = req.app.locals.Mdm.import_document(obj, "import")
+  obj = req.app.locals.Mdm.save_document(obj, req.params.step)
+
   res.send(obj);
 });
 

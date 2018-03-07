@@ -62,7 +62,7 @@ class Mdm {
     return id;
   }
 
-  import_document(obj, step) {
+  save_document(obj, step) {
     obj = obj_utils.normalize(obj, this.settings.steps[step].rules)
     this.keys.add_keys_from_document(obj)
     const import_id = this.get_document_id(obj, "import")
@@ -70,7 +70,7 @@ class Mdm {
     if (id) {
       this.db[step].save_obj(id, obj, import_id)
     } else {
-      log.error("Step " + step + ": missing keys in doc " + obj)
+      console.error("Step " + step + ": missing keys in doc " + obj)
     }
     return obj;
   }
