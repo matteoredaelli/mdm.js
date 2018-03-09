@@ -1,5 +1,7 @@
 audit:
+  - [source]
   - [ean]
+  - [brand]
   - [brand, product]
   - [width, series, rim]
 fs:

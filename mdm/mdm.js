@@ -21,6 +21,7 @@ var obj_utils = require('./object_utils');
 var mdm_keys = require('./document_keys');
 var mdm_values = require('./document_values');
 var mdm_db = require('./db');
+var mdm_audit = require('./audit');
 var fs = require('fs');
 
 class Mdm {
@@ -36,10 +37,12 @@ class Mdm {
       "merging": new mdm_db(path, "merging"),
       "audit":   new mdm_db(path, "audit")
     }
+    this.audit = new mdm_audit(this.settings.audit, this.db.audit)
 
     console.log("activating logging for database <import> PUT actions");
     this.db.import.db.on('put', function (key, value) {
        console.debug('Inserted', { key, value })
+       self.audit.save_new_values(value[key])
        console.debug('Trigger db <import> after PUT: normalize and save to <merging> database')
        self.save_document(value[key], "merging")
     })
@@ -84,24 +87,6 @@ class Mdm {
       console.error("Step " + step + ": missing keys in doc " + obj)
     }
   }
-
-
-  merge_documents() {
-    var self = this;
-    const from_step   = "import";
-    const target_step = "work";
-    const path = self.db.path + '/import';
-
-    fs.readdir(path, function(err, items) {
-      for (var i=0; i<items.length; i++) {
-          let filename = items[i]
-          console.log(filename);
-          doc = db.load(filename, null, "import")
-          doc.normalize(self, target_step)
-          doc.save("export")
-        }
-      });
-    }
-  }
+}
 
 module.exports = Mdm
