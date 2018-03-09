@@ -31,10 +31,20 @@ class DB{
     this.dbname = dbname;
     fs.existsSync(path) || fs.mkdirSync(path);
     this.db = level(path + "/" + dbname, { valueEncoding: 'json' })
+    this.dbdesc = "DB <" + this.dbname + ">: "
+    var self = this;
+
+    const array = ['del', 'put', 'opening', 'ready', 'open', 'closing', 'close'];
+    array.forEach(function(action) {
+      console.log(self.dbdesc + "activating logging for action "+ action);
+      self.db.on(action, function (key, value) {
+        console.debug(self.dbdesc + 'action=' + action + ' for key=' + key) // + (value == undefined) ? '' : ' and value=' + value)
+      })
+    });
   }
 
   save_raw(id, doc) {
-    console.debug("DB <" + this.dbname + ">: save_raw with id=<"  + id)
+    console.debug(this.dbdesc + "save_raw with id=<"  + id)
     this.db.put(id, doc, function (err)  {
       if (err) {
         console.error('Cannot save document due to err=' + err + ', doc=' + doc);
@@ -44,7 +54,7 @@ class DB{
   }
 
   load_raw(id) {
-    console.debug("DB <" + this.dbname + "> load_raw: with id=" + id)
+    console.debug(this.dbdesc + "load_raw: with id=" + id)
     // this.db.get(id)
     // .then(function (value) {
     //   console.debug(value)
@@ -61,24 +71,50 @@ class DB{
 
   save_obj(id, doc, import_id) {
     var self = this
-    console.debug("DB <" + self.dbname + "> save_obj: with id=" + id + ' and import_id=' + import_id)
-    return this.db.get(id)
+    var obj = {}
+    console.debug(self.dbdesc + "save_obj: with id=" + id + ' and import_id=' + import_id)
+    this.db.get(id)
       .then(function (obj) {
-        console.log("DB <" + self.dbname + "> save_obj: retreived object ")
+        console.log(self.dbdesc + "save_obj: retreived object ")
         console.log(obj)
-        if (! obj) {
-          obj = {}
-        };
         obj[import_id] = doc;
         return self.save_raw(id, obj)
       })
-      .catch(function (err) { console.error(err) })
+      .catch(function (err) {
+        console.error(err);
+        obj[import_id] = doc;
+        return self.save_raw(id, obj)
+      })
   }
 
   load_obj(id) {
-    console.debug("DB <" + this.dbname + "> Load_obj: with id=" + id)
+    console.debug(this.dbdesc + "Load_obj: with id=" + id)
     return this.load_raw(id);
   }
+
+  empty() {
+    var self = this;
+    this.db.createKeyStream()
+    .on('data', function (data) {
+      console.debug(self.dbdesc +  'deleting key=', data)
+        self.db.del(data, function (err) {
+          if (err) {
+            console.debug(self.dbdesc +  'cannot delete key=', data)
+          }
+        });
+      })
+  }
+
+  count() {
+    var count = 0;
+    this.db.createKeyStream()
+      .on('data', function (data) {
+        count = count + 1;
+      });
+    console.debug(this.dbdesc + 'count=' + count)
+    return count;
+  }
+
 
 }
 module.exports = DB

@@ -25,16 +25,27 @@ var fs = require('fs');
 
 class Mdm {
   constructor(settings) {
+    var self = this;
     const path = settings.fs.data_directory;
     this.settings = settings
     this.keys = new mdm_keys(path + '/' + settings.fs.document_keys_file)
     this.values = new mdm_values(path + '/' + settings.fs.document_values_file)
     //const reducer = (accumulator, currentValue) => accumulator[currentValue] = new mdm_db(path, currentValue);
     this.db = {
-      "import": new mdm_db(path, "import"),
-      "merging": new mdm_db(path, "merging")}
-    console.log(Object.keys(this.db))
+      "import":  new mdm_db(path, "import"),
+      "merging": new mdm_db(path, "merging"),
+      "audit":   new mdm_db(path, "audit")
+    }
+
+    console.log("activating logging for database <import> PUT actions");
+    this.db.import.db.on('put', function (key, value) {
+       console.debug('Inserted', { key, value })
+       console.debug('Trigger db <import> after PUT: normalize and save to <merging> database')
+       self.save_document(value[key], "merging")
+    })
+
     this.load()
+
   }
 
   save() {
@@ -68,11 +79,10 @@ class Mdm {
     const import_id = this.get_document_id(obj, "import")
     const id = this.get_document_id(obj, step)
     if (id) {
-      this.db[step].save_obj(id, obj, import_id)
+      return this.db[step].save_obj(id, obj, import_id)
     } else {
       console.error("Step " + step + ": missing keys in doc " + obj)
     }
-    return obj;
   }
 
 
