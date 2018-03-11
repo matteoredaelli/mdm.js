@@ -39,7 +39,7 @@ class Audit {
     var self = this
     this.db.load_raw(key)
       .then(function (obj) {
-        console.debug(key + " is already in teh database: nothing to do")
+        console.debug(key + " is already in the database: nothing to do")
       })
       .catch(function (err) {
         console.error(err);
@@ -50,11 +50,20 @@ class Audit {
 
   save_new_values(obj) {
     var self = this
+    var values = {}
     this.fields_list.forEach(function(keys) {
       console.debug("keys=" + keys)
-      const values = keys.map( x => (x in obj) ? obj[x] : "NULL");
-      const key = self.get_key(keys, values)
-      self.add_key_if_new(key)
+      if (keys == '__KEYS__') {
+        // saving objec keys
+        Object.keys(obj).forEach(function(k,v) {
+          let key = self.get_key(keys, [k])
+          self.add_key_if_new(key)
+        })
+      } else {
+        values = keys.map( x => (x in obj) ? obj[x] : "NULL");
+        let key = self.get_key(keys, values)
+        self.add_key_if_new(key)
+      }
     });
   }
 

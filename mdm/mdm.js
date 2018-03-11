@@ -18,8 +18,6 @@
 "use strict";
 
 var obj_utils = require('./object_utils');
-var mdm_keys = require('./document_keys');
-var mdm_values = require('./document_values');
 var mdm_db = require('./db');
 var mdm_audit = require('./audit');
 var fs = require('fs');
@@ -29,8 +27,6 @@ class Mdm {
     var self = this;
     const path = settings.fs.data_directory;
     this.settings = settings
-    this.keys = new mdm_keys(path + '/' + settings.fs.document_keys_file)
-    this.values = new mdm_values(path + '/' + settings.fs.document_values_file)
     //const reducer = (accumulator, currentValue) => accumulator[currentValue] = new mdm_db(path, currentValue);
     this.db = {
       "import":  new mdm_db(path, "import"),
@@ -52,20 +48,15 @@ class Mdm {
   }
 
   save() {
-    this.keys.save();
-    this.values.save();
+
   }
 
   load() {
-    this.keys.load();
-    this.values.load();
+
   }
 
   empty() {
-    this.keys = new mdm_keys()
-    this.values = new mdm_values()
-    this.keys.save()
-    this.values.save()
+
   }
 
   get_document_id(doc, step) {
@@ -78,7 +69,6 @@ class Mdm {
 
   save_document(obj, step) {
     obj = obj_utils.normalize(obj, this.settings.steps[step].rules)
-    this.keys.add_keys_from_document(obj)
     const import_id = this.get_document_id(obj, "import")
     const id = this.get_document_id(obj, step)
     if (id) {

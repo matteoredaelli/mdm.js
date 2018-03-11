@@ -1,4 +1,5 @@
 audit:
+  - [__KEYS__]
   - [source]
   - [ean]
   - [brand]
