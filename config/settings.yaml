@@ -1,18 +1,18 @@
 audit:
-  - [__KEYS__]
+  - [_FIELD_]
   - [source]
   - [ean]
   - [brand]
   - [brand, product]
   - [width, series, rim]
 fs:
-  data_directory: public/data
-  document_keys_file: keys.yaml
-  document_values_file: values.yaml
+  data_directory: data
+  log_directory: public/data/log
 steps:
   import:
     keys:
       - [source,id]
+    source_system_key: source
     rules:
       ## remove strange_characterts at the begin
       - filter:
@@ -83,7 +83,7 @@ steps:
           command: keys_replace
           param1: vehicle
       - filter:
-          keys: /^protezione del cerchio$/i
+          keys: /^(protezione del cerchio)|(bordo di protezione)$/i
         action:
           command: keys_replace
           param1: mfs
@@ -147,21 +147,21 @@ steps:
             param1: ''
         - filter:
             keys: /^seasonality$/i
-            values: /WINTER|INVERNAL|M\+S|SNOW|KITKARENGAS|NASTARENGAS/i
+            values: /WINTER|INVERNAL|M\+S|SNOW|KITKARENGAS|NASTARENGAS|Zimné/i
           action:
             command: values_replace
             param1: WINTER
             param2: true # replace_all string
         - filter:
             keys: /^seasonality$/i
-            values: /SUMMER|ESTIV|KESÄRENGAS/i
+            values: /SUMMER|ESTIV|KESÄRENGAS|Letné/i
           action:
             command: values_replace
             param1: SUMMER
             param2: true # replace_all string
         - filter:
             keys: /^seasonality$/i
-            values: /SEASON|STAGIONI|4MEVSIM|JOKASÄÄNRENGAS/i
+            values: /SEASON|STAGIONI|4MEVSIM|JOKASÄÄNRENGAS|Celoročné/i
           action:
             command: values_replace
             param1: SUMMER
@@ -191,7 +191,7 @@ steps:
             param1:
         - filter:
             keys: /^description$/i
-            values: /MFS|FSL|PROTEZIONE/i
+            values: / MFS|FSL|PROTEZIONE|FRP?/i
           action:
             command: key_add
             param1: mfs
@@ -259,3 +259,6 @@ steps:
             command: key_add
             param1: currency
             param2: EUR
+  export:
+      keys:
+        - [ean]

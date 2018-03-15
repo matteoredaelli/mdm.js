@@ -74,7 +74,7 @@ class Mdm {
     if (id) {
       return this.db[step].save_obj(id, obj, import_id)
     } else {
-      console.error("Step " + step + ": missing keys in doc " + obj)
+      console.error("Step " + step + ": missing ID keys in doc " + obj)
     }
   }
 }

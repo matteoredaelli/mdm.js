@@ -25,7 +25,12 @@ class Audit {
     this.db = db
     this.fields_list = fields_list
     console.debug(db.dbname + ": " + fields_list)
-    console.debug(fields_list)
+
+    console.log("activating logging for database <audit> PUT actions");
+    this.db.db.on('put', function (key, value) {
+       console.debug('Inserted', { key, value })
+    })
+
   }
 
   get_key(keys, values, sep1 = "|", sep2="&") {
@@ -53,7 +58,7 @@ class Audit {
     var values = {}
     this.fields_list.forEach(function(keys) {
       console.debug("keys=" + keys)
-      if (keys == '__KEYS__') {
+      if (keys == '_FIELD_') {
         // saving objec keys
         Object.keys(obj).forEach(function(k,v) {
           let key = self.get_key(keys, [k])
