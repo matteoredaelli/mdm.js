@@ -19,6 +19,28 @@
 
 var self  = this;
 
+exports.merge_objects = function(objList, source_field, start={} ) {
+  if (objList == undefined || ! (objList instanceof Array) || objList.length == 0) {
+    return start;
+  }
+  const doc = objList.pop();
+  var new_doc = start
+  const source = doc[source_field];
+
+  for ( var k in doc) {
+    let v = doc[k]
+    if (! (k in  new_doc)) {
+      new_doc[k] = {}
+    }
+    if (! (v in  new_doc[k])) {
+      new_doc[k][v] = new Set([source])
+    } else {
+      new_doc[k][v].add(source)
+    }
+  }
+  return this.merge_objects(objList, source_field, new_doc)
+}
+
 exports.convert_value_string = function(value) {
   var new_value = value;
   switch(value) {

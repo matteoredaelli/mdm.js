@@ -216,7 +216,7 @@ steps:
           action:
             command: key_add
             param1: seasonality
-            param2: winter
+            param2: WINTER
         - filter:
             keys: /^description$/i
             values: / (s-i|sealing|cs)/i
@@ -262,3 +262,7 @@ steps:
   export:
       keys:
         - [ean]
+      fields:
+        - ean: string
+        - brand: string
+        - descrition: string_multivalue

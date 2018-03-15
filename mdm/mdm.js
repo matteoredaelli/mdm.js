@@ -55,8 +55,8 @@ class Mdm {
 
   }
 
-  empty() {
-
+  merge_doc(doc) {
+    return object_utils.merge_objects(Object.values(doc), this.settings.steps.import.source_system_key, {})
   }
 
   get_document_id(doc, step) {
