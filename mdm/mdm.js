@@ -30,52 +30,82 @@ class Mdm {
     //const reducer = (accumulator, currentValue) => accumulator[currentValue] = new mdm_db(path, currentValue);
     this.db = {
       "import":  new mdm_db(path, "import"),
-      "merging": new mdm_db(path, "merging"),
+      "append": new mdm_db(path, "append"),
+      "merge": new mdm_db(path, "merge"),
       "audit":   new mdm_db(path, "audit")
     }
     this.audit = new mdm_audit(this.settings.audit, this.db.audit)
 
     console.log("activating logging for database <import> PUT actions");
     this.db.import.db.on('put', function (key, value) {
-       console.debug('Inserted', { key, value })
+       console.debug('DB <import>: inserted', { key, value })
        self.audit.save_new_values(value[key])
-       console.debug('Trigger db <import> after PUT: normalize and save to <merging> database')
-       self.save_document(value[key], "merging")
+       console.debug('Trigger db <import> after PUT: normalize and save to <append> database')
+       let obj = value[key]
+       obj = obj_utils.normalize(obj, self.settings.steps.append.rules)
+       const import_id = self.get_document_id(obj, "import")
+       self.save_document(obj, "merge", import_id)
+    })
+
+    console.log("activating logging for database <append> PUT actions");
+    this.db.append.db.on('put', function (key, value) {
+       console.debug('DB <append>: inserted', { key, value })
+       console.debug('Trigger db <append> after PUT: normalize and save to <merge> database')
+       let objList = Object.values(value)
+       let skip_keys = self.settings.steps.merge.keys[0]
+       //obj = obj_utils.normalize(obj, self.settings.steps.merge.rules)
+       let new_doc = obj_utils.merge_objects(objList, skip_keys, self.settings.steps.import.source_system_key, {})
+       //const internal_id = self.get_document_id(obj)
+       self.save_document(new_doc, "merge")
     })
 
     this.load()
 
   }
 
-  save() {
-
-  }
-
-  load() {
-
-  }
-
-  merge_doc(doc) {
-    return object_utils.merge_objects(Object.values(doc), this.settings.steps.import.source_system_key, {})
-  }
-
-  get_document_id(doc, step) {
-    const nokey = "__NOKEY__";
-    const keys = this.settings.steps[step].keys[0];
-    const map = keys.map(x => x in doc ? doc[x] : nokey);
+  get_id(obj, step) {
+    const nokey = "_NOKEY_";
+    const keys = settings.steps[step].keys[0];
+    const map = keys.map(x => x in obj ? obj[x] : nokey);
     const id = map.includes(nokey) ? null : map.join('-');
+    console.debug("get_id: id=" + id + ", step=" + step)
     return id;
   }
 
-  save_document(obj, step) {
-    obj = obj_utils.normalize(obj, this.settings.steps[step].rules)
-    const import_id = this.get_document_id(obj, "import")
+
+  step_merge(obj) {
+    var self = this;
+    var obj_new = obj;
+    const step = "merge"
+    let skip_keys = self.settings.steps.merge.keys[0]
+    console.debug("merge_doc: input is " + JSON.stringify(doc))
     const id = this.get_document_id(obj, step)
     if (id) {
-      return this.db[step].save_obj(id, obj, import_id)
+      self.db[step].get(id)
+      .then(function (obj_old) {
+        console.log(self.dbdesc + "step_merge: retreived object ")
+        console.log(obj_old)
+        return self.save_raw(id, obj)
+      })
+      .catch(function (err) {
+        console.error(err);
+        obj[import_id] = doc;
+        return self.save_raw(id, obj)
+      })
+      return this.db[step].save_raw(id, obj_new)
     } else {
       console.error("Step " + step + ": missing ID keys in doc " + obj)
     }
+    const target_doc =  obj_utils.merge_objects(Object.values(doc), skip_keys, this.settings.steps.import.source_system_key)
+    console.debug("merge_doc: output is " + JSON.stringify(target_doc))
+    return target_doc;
+
+  }
+
+
+  save_document(obj, step) {
+    const id = this.get_document_id(obj, step)
+
   }
 }
 

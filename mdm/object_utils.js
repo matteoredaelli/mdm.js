@@ -19,7 +19,9 @@
 
 var self  = this;
 
-exports.merge_objects = function(objList, source_field, start={} ) {
+exports.merge_objects = function(objList, skip_keys, source_field, start={} ) {
+  console.debug("merge_objects: skip_keys=" + skip_keys + ", source_filed=" + source_field)
+  
   if (objList == undefined || ! (objList instanceof Array) || objList.length == 0) {
     return start;
   }
@@ -32,13 +34,13 @@ exports.merge_objects = function(objList, source_field, start={} ) {
     if (! (k in  new_doc)) {
       new_doc[k] = {}
     }
-    if (! (v in  new_doc[k])) {
-      new_doc[k][v] = new Set([source])
+    if (k in skip_keys) {
+      new_doc[k] = v
     } else {
-      new_doc[k][v].add(source)
+      new_doc[k][source] = v
     }
   }
-  return this.merge_objects(objList, source_field, new_doc)
+  return this.merge_objects(objList, skip_keys, source_field, new_doc)
 }
 
 exports.convert_value_string = function(value) {

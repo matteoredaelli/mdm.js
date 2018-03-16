@@ -69,9 +69,12 @@ class DB{
   }
 
 
-  save_obj(id, doc, import_id) {
+  save_obj(id, doc, import_id = null) {
     var self = this
     var obj = {}
+    if (import_id == null) {
+      import_id = id
+    }
     console.debug(self.dbdesc + "save_obj: with id=" + id + ' and import_id=' + import_id)
     this.db.get(id)
       .then(function (obj) {

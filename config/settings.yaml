@@ -118,7 +118,7 @@ steps:
         action:
           command: values_to_uppercase
           param1:
-  merging:
+  append:
       keys:
         - [ean]
         - [brand, manufacturer_number]
