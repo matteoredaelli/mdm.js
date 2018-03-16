@@ -38,74 +38,79 @@ class Mdm {
 
     console.log("activating logging for database <import> PUT actions");
     this.db.import.db.on('put', function (key, value) {
-       console.debug('DB <import>: inserted', { key, value })
-       self.audit.save_new_values(value[key])
        console.debug('Trigger db <import> after PUT: normalize and save to <append> database')
-       let obj = value[key]
-       obj = obj_utils.normalize(obj, self.settings.steps.append.rules)
-       const import_id = self.get_document_id(obj, "import")
-       self.save_document(obj, "merge", import_id)
+       self.step_append(value)
     })
 
     console.log("activating logging for database <append> PUT actions");
     this.db.append.db.on('put', function (key, value) {
        console.debug('DB <append>: inserted', { key, value })
        console.debug('Trigger db <append> after PUT: normalize and save to <merge> database')
-       let objList = Object.values(value)
-       let skip_keys = self.settings.steps.merge.keys[0]
-       //obj = obj_utils.normalize(obj, self.settings.steps.merge.rules)
-       let new_doc = obj_utils.merge_objects(objList, skip_keys, self.settings.steps.import.source_system_key, {})
-       //const internal_id = self.get_document_id(obj)
-       self.save_document(new_doc, "merge")
+       self.step_merge(value)
     })
-
-    this.load()
-
   }
 
-  get_id(obj, step) {
+  get_document_id(obj, step) {
     const nokey = "_NOKEY_";
-    const keys = settings.steps[step].keys[0];
+    const keys = this.settings.steps[step].keys[0];
+    if (step == "merge") {
+      // extract key from first obj
+      obj = Object.values(obj)[0]
+    }
     const map = keys.map(x => x in obj ? obj[x] : nokey);
     const id = map.includes(nokey) ? null : map.join('-');
     console.debug("get_id: id=" + id + ", step=" + step)
     return id;
   }
 
+  step_import(obj) {
+    const step="import";
+    obj = obj_utils.normalize(obj, this.settings.steps[step].rules)
+    const id = this.get_document_id(obj, step)
+    this.db[step].save_raw(id, obj)
+  }
+
+  step_append(obj) {
+    const step = "append"
+    var self = this;
+    self.audit.save_new_values(obj)
+    obj = obj_utils.normalize(obj, self.settings.steps[step].rules)
+    var obj_new = {}
+    let local_id = obj[self.settings.mdm.source_system_key]
+    const id = this.get_document_id(obj, step)
+    if (! id) {
+      console.error("Step " + step + ": missing ID keys in doc " + obj)
+    } else {
+      self.db[step].load_raw(id)
+      .then(function (obj_new) {
+        console.log("step_append: retreived object ")
+        console.debug(obj_new)
+        obj_new[local_id] = obj
+        return self.db[step].save_raw(id, obj_new)
+      })
+      .catch(function (err) {
+        console.error(err);
+        obj_new = {}
+        obj_new[local_id] = obj;
+        return self.db[step].save_raw(id, obj_new)
+      })
+    } // end else
+  }
 
   step_merge(obj) {
     var self = this;
     var obj_new = obj;
     const step = "merge"
-    let skip_keys = self.settings.steps.merge.keys[0]
-    console.debug("merge_doc: input is " + JSON.stringify(doc))
+    let skip_keys = self.settings.steps[step].keys[0]
+    let objList = Object.values(obj)
+    console.debug("step merge: input is " + JSON.stringify(obj))
     const id = this.get_document_id(obj, step)
-    if (id) {
-      self.db[step].get(id)
-      .then(function (obj_old) {
-        console.log(self.dbdesc + "step_merge: retreived object ")
-        console.log(obj_old)
-        return self.save_raw(id, obj)
-      })
-      .catch(function (err) {
-        console.error(err);
-        obj[import_id] = doc;
-        return self.save_raw(id, obj)
-      })
-      return this.db[step].save_raw(id, obj_new)
-    } else {
+    if (! id) {
       console.error("Step " + step + ": missing ID keys in doc " + obj)
+    } else {
+      let obj_new = obj_utils.merge_objects(objList, skip_keys, self.settings.mdm.source_system_key, {})
+      return this.db[step].save_raw(id, obj_new)
     }
-    const target_doc =  obj_utils.merge_objects(Object.values(doc), skip_keys, this.settings.steps.import.source_system_key)
-    console.debug("merge_doc: output is " + JSON.stringify(target_doc))
-    return target_doc;
-
-  }
-
-
-  save_document(obj, step) {
-    const id = this.get_document_id(obj, step)
-
   }
 }
 

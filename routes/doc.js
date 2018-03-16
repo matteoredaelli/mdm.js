@@ -30,12 +30,11 @@ router.get('/:id/:step', function(req, res, next) {
     .catch(function (err) { console.error(err); res.send({}); });
 });
 
-router.post('/save/:step', function(req, res, next) {
+router.post('/import', function(req, res, next) {
   var obj = req.body
   console.debug('\x1b[33m%s\x1b[0m: ', obj);
   //obj = req.app.locals.Mdm.import_document(obj, "import")
-  req.app.locals.Mdm.save_document(obj, req.params.step)
-
+  req.app.locals.Mdm.step_import(obj)
   res.send(obj);
 });
 

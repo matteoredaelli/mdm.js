@@ -8,6 +8,11 @@ audit:
 fs:
   data_directory: data
   log_directory: public/data/log
+mdm:
+  source_system_key: source
+  unique_keys:
+    - [ean]
+    - [brand, manufacturer_number]
 steps:
   import:
     keys:
@@ -259,6 +264,9 @@ steps:
             command: key_add
             param1: currency
             param2: EUR
+  merge:
+      keys:
+        - [ean]
   export:
       keys:
         - [ean]
