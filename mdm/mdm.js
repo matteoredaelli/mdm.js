@@ -48,6 +48,13 @@ class Mdm {
        console.debug('Trigger db <append> after PUT: normalize and save to <merge> database')
        self.step_merge(value)
     })
+
+    console.log("activating logging for database <merge> PUT actions");
+    this.db.merge.db.on('put', function (key, value) {
+       console.debug('DB <merge>: inserted', { key, value })
+       console.debug('Trigger db <merge> after PUT: normalize and save to <export> database')
+       self.step_export(value)
+    })
   }
 
   get_document_id(obj, step) {
@@ -111,6 +118,11 @@ class Mdm {
       let obj_new = obj_utils.merge_objects(objList, skip_keys, self.settings.mdm.source_system_key, {})
       return this.db[step].save_raw(id, obj_new)
     }
+  }
+
+  step_export(obj) {
+    var new_obj = obj_utils.export_object(obj)
+    console.log(new_obj)
   }
 }
 

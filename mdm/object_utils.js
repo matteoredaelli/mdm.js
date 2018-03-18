@@ -21,7 +21,7 @@ var self  = this;
 
 exports.merge_objects = function(objList, skip_keys, source_field, start={} ) {
   console.debug("merge_objects: skip_keys=" + skip_keys + ", source_filed=" + source_field)
-  
+
   if (objList == undefined || ! (objList instanceof Array) || objList.length == 0) {
     return start;
   }
@@ -41,6 +41,36 @@ exports.merge_objects = function(objList, skip_keys, source_field, start={} ) {
     }
   }
   return this.merge_objects(objList, skip_keys, source_field, new_doc)
+}
+
+exports.sort_object_by_values = function(obj) {
+  return Object.keys(obj).map(function (key) {
+    return [key, this[key]]
+  }, obj).sort(function (a, b) {
+    return b[1] - a[1]
+  })
+}
+
+exports.export_object = function(obj) {
+  console.debug("export_object: " + obj)
+  var new_obj = {}
+
+  for ( var key in obj) {
+    console.debug("export_object: key=" + key)
+    let values = Object.values(obj[key])
+    console.debug("export_object: key=" + key + ", values=" + values)
+    // count occurrences
+    let count = {}
+    values.forEach(function(el){
+      count[el] = count[el] + 1 || 1
+    } );
+    console.debug("export_object: count:" + count)
+    // sort object by value
+    const sorted = this.sort_object_by_values(count)
+    console.debug("export_object: sorted:" + count)
+    new_obj[key] =  sorted && sorted[0] ? sorted[0][0]: null
+  }
+  return new_obj
 }
 
 exports.convert_value_string = function(value) {
