@@ -105,19 +105,24 @@ class DB{
             console.debug(self.dbdesc +  'cannot delete key=', data)
           }
         });
-      })
+      }) //data
   }
 
-  count() {
+  count(callback) {
+    var self = this;
     var count = 0;
-    this.db.createKeyStream()
-      .on('data', function (data) {
-        count = count + 1;
-      });
-    console.debug(this.dbdesc + 'count=' + count)
+    var stream = this.db.createKeyStream()
+
+    stream.on('data', function (data) {
+      count = count + 1;
+      console.debug(self.dbdesc + 'count: stream DATA count=' + count)
+    });
+    stream.on('end', function() {
+      console.debug(self.dbdesc + 'count: stram END count=' + count)
+      callback(count);
+    })
     return count;
   }
-
 
 }
 module.exports = DB

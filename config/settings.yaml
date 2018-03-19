@@ -231,6 +231,13 @@ steps:
             param2: true
         - filter:
             keys: /^description$/i
+            values: / XL/i
+          action:
+            command: key_add
+            param1: extra_load
+            param2: true
+        - filter:
+            keys: /^description$/i
             values: /studded|chiodat|NASTARENGAS|SPIKE/i
           action:
             command: key_add
@@ -273,13 +280,28 @@ steps:
       fields:
         ean: [string]
         brand: [string]
+        currency: [string, multivalue]
         description: [string, multivalue]
         extra: [string, multivalue]
+        extra_load: [string]
+        label_fuel: [string]
+        label_noise: [string]
+        label_wet: [string]
+        load_index: [string]
         logging: [string, multivalue]
         manufacturer_number: [string]
-        oe_mark: [string, multivalue]
+        mfs: [string]
+        oe_marks: [string, multivalue]
+        price: [string, multivalue]
         product: [string, multivalue]
+        rim: [string]
         runflat: [bool]
+        seal_inside: [string]
         seasonality: [string]
+        series: [string]
         source: [string, multivalue]
+        speed_index: [string]
+        studdable: [string]
+        studdle: [string]
         vehicle: [string, multivalue]
+        width: [string]

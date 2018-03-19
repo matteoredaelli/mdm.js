@@ -23,8 +23,21 @@ var router = express.Router();
 router.get('/count/:db', function(req, res, next) {
   //console.debug('\x1b[33m%s\x1b[0m: ', obj);
   //obj = req.app.locals.Mdm.import_document(obj, "import")
-  const tot = req.app.locals.Mdm.db[req.params.db].count()
-  res.send({"count": tot});
+  //const tot = req.app.locals.Mdm.db[req.params.db].count(res.send)
+
+    var count = 0;
+
+    var stream = req.app.locals.Mdm.db[req.params.db].db.createKeyStream()
+
+    stream.on('data', function (data) {
+      count = count + 1;
+      console.debug('count: stream DATA count=' + count)
+    });
+    stream.on('end', function() {
+      console.debug('count: stram END count=' + count)
+      res.send({"count": count});
+    })
+  //res.send({"count": tot});
 });
 
 router.post('/empty/:db', function(req, res, next) {

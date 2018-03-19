@@ -58,15 +58,20 @@ exports.export_object = function(obj, fields) {
 
   var new_obj = {}
   var self = this
-  for ( var key in obj) {
+  for ( var key in fields) {
     console.debug("export_object: key='" + key + "'")
-    let values = Object.values(obj[key])
     var new_value = null
-    console.debug("export_object: key=" + key + ", values=" + values)
-    if (fields_keys.includes(key) ) {
+    if (key in obj ) {
+      let values = Object.values(obj[key])
+      console.debug("export_object: key=" + key + ", values=" + values)
       if (fields[key].includes("multivalue") ) {
         console.debug("export_object: key=" + key + " is multivalue")
-        new_value = Object.values(values)
+        //new_value = Object.values(values)
+        // remove duplicates
+        new_value = [...new Set(Object.values(values))]
+        if (new_value.length == 1) {
+          new_value = new_value[0]
+        }
       } else {
         console.debug("export_object: key=" + key + " value wil be merged")
         new_value = self.extract_field_with_more_occurrences(values)
