@@ -29,10 +29,11 @@ class Mdm {
     this.settings = settings
     //const reducer = (accumulator, currentValue) => accumulator[currentValue] = new mdm_db(path, currentValue);
     this.db = {
-      "import":  new mdm_db(path, "import"),
+      "import": new mdm_db(path, "import"),
       "append": new mdm_db(path, "append"),
-      "merge": new mdm_db(path, "merge"),
-      "audit":   new mdm_db(path, "audit")
+      "merge":  new mdm_db(path, "merge"),
+      "export": new mdm_db(path, "export"),
+      "audit":  new mdm_db(path, "audit")
     }
     this.audit = new mdm_audit(this.settings.audit, this.db.audit)
 
@@ -121,8 +122,11 @@ class Mdm {
   }
 
   step_export(obj) {
-    var new_obj = obj_utils.export_object(obj)
-    console.log(new_obj)
+    const step = "export"
+    var new_obj = obj_utils.export_object(obj, this.settings.steps[step].fields)
+    console.debug(new_obj)
+    const id = this.get_document_id(new_obj, step)
+    this.db[step].save_raw(id, new_obj)
   }
 }
 

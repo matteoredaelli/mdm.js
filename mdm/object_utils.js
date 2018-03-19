@@ -51,26 +51,44 @@ exports.sort_object_by_values = function(obj) {
   })
 }
 
-exports.export_object = function(obj) {
-  console.debug("export_object: " + obj)
-  var new_obj = {}
+exports.export_object = function(obj, fields) {
+  console.debug("export_object: " + JSON.stringify(obj))
+  const fields_keys = Object.keys(fields)
+  console.debug("export_object: fields to export: " + fields_keys)
 
+  var new_obj = {}
+  var self = this
   for ( var key in obj) {
-    console.debug("export_object: key=" + key)
+    console.debug("export_object: key='" + key + "'")
     let values = Object.values(obj[key])
+    var new_value = null
     console.debug("export_object: key=" + key + ", values=" + values)
-    // count occurrences
-    let count = {}
-    values.forEach(function(el){
-      count[el] = count[el] + 1 || 1
-    } );
-    console.debug("export_object: count:" + count)
-    // sort object by value
-    const sorted = this.sort_object_by_values(count)
-    console.debug("export_object: sorted:" + count)
-    new_obj[key] =  sorted && sorted[0] ? sorted[0][0]: null
+    if (fields_keys.includes(key) ) {
+      if ("multivalue" in fields[key]) {
+        console.debug("export_object: key=" + key + " is multivalue")
+        new_value = Object.values(values)
+      } else {
+        console.debug("export_object: key=" + key + " value wil be merged")
+        new_value = self.extract_field_with_more_occurrences(values)
+      }
+      console.debug("export_object: key=" + key + ", new value=" + new_value)
+      new_obj[key] = new_value
+    }
   }
   return new_obj
+}
+
+exports.extract_field_with_more_occurrences = function(values) {
+  // count occurrences
+  let count = {}
+  values.forEach(function(el){
+    count[el] = count[el] + 1 || 1
+  } );
+  console.debug("export_object: count:" + count)
+  // sort object by value
+  const sorted = this.sort_object_by_values(count)
+  console.debug("export_object: sorted:" + count)
+  return (sorted && sorted[0]) ? sorted[0][0]: null
 }
 
 exports.convert_value_string = function(value) {

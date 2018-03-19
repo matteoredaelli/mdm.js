@@ -271,6 +271,15 @@ steps:
       keys:
         - [ean]
       fields:
-        - ean: string
-        - brand: string
-        - descrition: string_multivalue
+        ean: [string]
+        brand: [string]
+        description: [string, multivalue]
+        extra: [string, multivalue]
+        logging: [string, multivalue]
+        manufacturer_number: [string]
+        oe_mark: [string, multivalue]
+        product: [string, multivalue]
+        runflat: [bool]
+        seasonality: [string]
+        source: [string, multivalue]
+        vehicle: [string, multivalue]
