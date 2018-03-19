@@ -64,7 +64,7 @@ exports.export_object = function(obj, fields) {
     var new_value = null
     console.debug("export_object: key=" + key + ", values=" + values)
     if (fields_keys.includes(key) ) {
-      if ("multivalue" in fields[key]) {
+      if (fields[key].includes("multivalue") ) {
         console.debug("export_object: key=" + key + " is multivalue")
         new_value = Object.values(values)
       } else {
