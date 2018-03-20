@@ -47,4 +47,24 @@ router.post('/empty/:db', function(req, res, next) {
   res.send("ok");
 });
 
+router.get('/export/:db/:format', function(req, res, next) {
+  //console.debug('\x1b[33m%s\x1b[0m: ', obj);
+  //obj = req.app.locals.Mdm.import_document(obj, "import")
+  //const tot = req.app.locals.Mdm.db[req.params.db].count(res.send)
+
+    var result = "";
+
+    var stream = req.app.locals.Mdm.db[req.params.db].db.createValueStream()
+
+    stream.on('data', function (data) {
+      result = result + Object.values(data).join(";") + "\n";
+    });
+    stream.on('end', function() {
+      console.debug('export: stream END' )
+      res.send(result);
+    })
+  //res.send({"count": tot});
+});
+
+
 module.exports = router;
