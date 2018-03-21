@@ -76,9 +76,9 @@ exports.export_object = function(obj, fields) {
         console.debug("export_object: key=" + key + " value wil be merged")
         new_value = self.extract_field_with_more_occurrences(values)
       }
-      console.debug("export_object: key=" + key + ", new value=" + new_value)
-      new_obj[key] = new_value
     }
+    console.debug("export_object: key=" + key + ", new value=" + new_value)
+    new_obj[key] = new_value
   }
   return new_obj
 }

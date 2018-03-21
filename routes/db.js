@@ -61,6 +61,7 @@ router.get('/export/:db/:format', function(req, res, next) {
     });
     stream.on('end', function() {
       console.debug('export: stream END' )
+      res.setHeader('Content-Type', 'text/csv');
       res.send(result);
     })
   //res.send({"count": tot});
