@@ -33,7 +33,7 @@ class Audit {
 
   }
 
-  get_key(keys, values, sep1 = "|", sep2="&") {
+  get_key(keys, values, sep1 = "|", sep2="+") {
     const key =  keys.join(sep1) + sep2 + values.join(sep1)
     console.debug("get_key from keys=" + keys + " and values=" + values)
     console.debug("  key=" + key)
@@ -48,10 +48,31 @@ class Audit {
       })
       .catch(function (err) {
         console.error(err);
+        self.log(key)
+        .then(function (obj) {  console.log(obj);} )
+        .catch(function (err) { console.error(err); });
         return self.db.save_raw(key, Date.now())
       })
   }
 
+  append(key, text, sep="&") {
+    var self = this
+    this.db.load_raw(key)
+      .then(function (obj) {
+        console.debug(key + " is already in the database")
+        return self.db.save_raw(key, obj + sep + text)
+      })
+      .catch(function (err) {
+        console.error(err);
+        return self.db.save_raw(key, text)
+      })
+  }
+
+  log(text) {
+    //const yyyymmdd=x=>(var f=x=>(x<10&&'0')+x,x.getFullYear()+f(x.getMonth()+1)+f(x.getDate()));
+    const key = "log"; // yyyymmdd(new Date)
+    return this.append(key, text)
+  }
 
   save_new_values(obj) {
     var self = this
