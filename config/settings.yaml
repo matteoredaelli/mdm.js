@@ -49,6 +49,21 @@ steps:
           command: values_replace
           param1: ''
       - filter:
+          values: /^sì|si|yes$/i
+        action:
+          command: values_replace
+          param1: true
+      - filter:
+          values: /^sno$/i
+        action:
+          command: values_replace
+          param1: false
+      - filter:
+          values: /^\s*$/i
+        action:
+          command: values_replace
+          param1: null
+      - filter:
         action:
           command: keys_to_lowercase
           param1:

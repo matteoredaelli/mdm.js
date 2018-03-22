@@ -55,7 +55,7 @@ class Audit {
       })
   }
 
-  append(key, text, sep="&") {
+  append(key, text, sep="\n") {
     var self = this
     this.db.load_raw(key)
       .then(function (obj) {
@@ -69,8 +69,7 @@ class Audit {
   }
 
   log(text) {
-    //const yyyymmdd=x=>(var f=x=>(x<10&&'0')+x,x.getFullYear()+f(x.getMonth()+1)+f(x.getDate()));
-    const key = "log"; // yyyymmdd(new Date)
+    const key = new Date().toJSON().slice(0,10).replace(/-/g,'');
     return this.append(key, text)
   }
 
