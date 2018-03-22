@@ -118,7 +118,7 @@ class DB{
       console.debug(self.dbdesc + 'count: stream DATA count=' + count)
     });
     stream.on('end', function() {
-      console.debug(self.dbdesc + 'count: stram END count=' + count)
+      console.debug(self.dbdesc + 'count: stream END count=' + count)
       callback(count);
     })
     return count;

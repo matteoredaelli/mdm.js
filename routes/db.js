@@ -47,7 +47,27 @@ router.post('/empty/:db', function(req, res, next) {
   res.send("ok");
 });
 
-router.get('/export/:db/:format', function(req, res, next) {
+router.get('/step_export', function(req, res, next) {
+  //console.debug('\x1b[33m%s\x1b[0m: ', obj);
+  //obj = req.app.locals.Mdm.import_document(obj, "import")
+  //const tot = req.app.locals.Mdm.db[req.params.db].count(res.send)
+
+    var result = 0;
+
+    var stream = req.app.locals.Mdm.db["merge"].db.createValueStream()
+
+    stream.on('data', function (data) {
+      req.app.locals.Mdm.step_export(data)
+      result = result + 1;
+    });
+    stream.on('end', function() {
+      console.debug('export: stream END' )
+      res.setHeader('Content-Type', 'text/json');
+      res.send({"count" :result});
+    })
+  //res.send({"count": tot});
+});
+router.get('/export/:db', function(req, res, next) {
   //console.debug('\x1b[33m%s\x1b[0m: ', obj);
   //obj = req.app.locals.Mdm.import_document(obj, "import")
   //const tot = req.app.locals.Mdm.db[req.params.db].count(res.send)
