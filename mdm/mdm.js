@@ -82,7 +82,6 @@ class Mdm {
   step_append(obj) {
     const step = "append"
     var self = this;
-    self.audit.save_new_values(obj)
     obj = obj_utils.normalize(obj, self.settings.steps[step].rules)
     var obj_new = {}
     let local_id = obj[self.settings.mdm.source_system_key]
@@ -126,6 +125,7 @@ class Mdm {
     const step = "export"
     var new_obj = obj_utils.export_object(obj, this.settings.steps[step].fields)
     console.debug(new_obj)
+    this.audit.save_new_values(new_obj)
     const id = this.get_document_id(new_obj, step)
     this.db[step].save_raw(id, new_obj)
   }
@@ -137,7 +137,7 @@ class Mdm {
         self.step_append(obj)
         break
       case 'merge':
-        self.step_berge(obj)
+        self.step_merge(obj)
         break
       case 'export':
         self.step_export(obj)
