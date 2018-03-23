@@ -98,14 +98,16 @@ exports.extract_field_with_more_occurrences = function(values) {
 
 exports.convert_value_string = function(value) {
   var new_value = value;
-  switch(value) {
+  switch(value.toLowerCase()) {
     case "true":
     case true:
     new_value = true
     break;
     case "false":
+    case "false":
     case false:
     new_value = false
+    break;
     case 'null':
     new_value = null
     break;
@@ -268,6 +270,7 @@ exports.keys_replace = function(obj, filter, value) {
 };
 
 exports.values_replace = function(obj, filter, new_value, replace_all_string=false) {
+  var new_value = self.convert_value_string(new_value);
   Object.keys(obj).forEach(function (key) {
     var v = obj[key];
     if (!v || v.constructor !== String)
@@ -282,6 +285,7 @@ exports.values_replace = function(obj, filter, new_value, replace_all_string=fal
          case "false":
          case false:
          obj[key] = false
+         break;
          case 'null':
          obj[key] = null
          break;
