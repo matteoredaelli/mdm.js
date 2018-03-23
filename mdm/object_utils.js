@@ -98,17 +98,19 @@ exports.extract_field_with_more_occurrences = function(values) {
 
 exports.convert_value_string = function(value) {
   var new_value = value;
-  switch(value.toLowerCase()) {
+  switch(value) {
     case "true":
+    case "TRUE":
     case true:
     new_value = true
     break;
-    case "false":
+    case "FALSE":
     case "false":
     case false:
     new_value = false
     break;
     case 'null':
+    case 'NULL':
     new_value = null
     break;
     default:

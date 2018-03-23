@@ -37,25 +37,26 @@ class Mdm {
     }
     this.audit = new mdm_audit(this.settings.audit, this.db.audit)
 
-    console.log("activating logging for database <import> PUT actions");
-    this.db.import.db.on('put', function (key, value) {
-       console.debug('Trigger db <import> after PUT: normalize and save to <append> database')
-       self.step_append(value)
-    })
+    // console.log("activating logging for database <import> PUT actions");
+    // this.db.import.db.on('put', function (key, value) {
+    //    console.debug('Trigger db <import> after PUT: normalize and save to <append> database')
+    //    self.step_append(value)
+    // })
 
-    console.log("activating logging for database <append> PUT actions");
-    this.db.append.db.on('put', function (key, value) {
-       console.debug('DB <append>: inserted', { key, value })
-       console.debug('Trigger db <append> after PUT: normalize and save to <merge> database')
-       self.step_merge(value)
-    })
+    // console.log("activating logging for database <append> PUT actions");
+    // this.db.append.db.on('put', function (key, value) {
+    //    console.debug('DB <append>: inserted', { key, value })
+    //    console.debug('Trigger db <append> after PUT: normalize and save to <merge> database')
+    //    self.step_merge(value)
+    // })
 
-    console.log("activating logging for database <merge> PUT actions");
-    this.db.merge.db.on('put', function (key, value) {
-       console.debug('DB <merge>: inserted', { key, value })
-       console.debug('Trigger db <merge> after PUT: normalize and save to <export> database')
-       self.step_export(value)
-    })
+    // this slows down too much the import.. better to do this step only when we want to export the data
+    // console.log("activating logging for database <merge> PUT actions");
+    // this.db.merge.db.on('put', function (key, value) {
+    //    console.debug('DB <merge>: inserted', { key, value })
+    //    console.debug('Trigger db <merge> after PUT: normalize and save to <export> database')
+    //    self.step_export(value)
+    // })
   }
 
   get_document_id(obj, step) {
@@ -128,6 +129,26 @@ class Mdm {
     const id = this.get_document_id(new_obj, step)
     this.db[step].save_raw(id, new_obj)
   }
+
+  step(step, obj) {
+    var self = this;
+    switch (step) {
+      case 'append':
+        self.step_append(obj)
+        break
+      case 'merge':
+        self.step_berge(obj)
+        break
+      case 'export':
+        self.step_export(obj)
+        break
+      default:
+      console.log("Unknown step" + step)
+    }
+
+  }
+
+
 }
 
 module.exports = Mdm

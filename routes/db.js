@@ -47,26 +47,31 @@ router.post('/empty/:db', function(req, res, next) {
   res.send("ok");
 });
 
-router.get('/step_export', function(req, res, next) {
+router.post('/step/:from/:to', function(req, res, next) {
   //console.debug('\x1b[33m%s\x1b[0m: ', obj);
   //obj = req.app.locals.Mdm.import_document(obj, "import")
   //const tot = req.app.locals.Mdm.db[req.params.db].count(res.send)
 
     var result = 0;
+    const from = req.params.from;
+    const to   = req.params.to;
+    console.debug("DB step from=" + from + ', to=' + to)
 
-    var stream = req.app.locals.Mdm.db["merge"].db.createValueStream()
+    var stream = req.app.locals.Mdm.db[from].db.createValueStream()
 
     stream.on('data', function (data) {
-      req.app.locals.Mdm.step_export(data)
+      req.app.locals.Mdm.step(to, data)
       result = result + 1;
     });
     stream.on('end', function() {
-      console.debug('export: stream END' )
+      console.debug(from + ': stream END' )
       res.setHeader('Content-Type', 'text/json');
       res.send({"count" :result});
     })
   //res.send({"count": tot});
 });
+
+
 router.get('/export/:db', function(req, res, next) {
   //console.debug('\x1b[33m%s\x1b[0m: ', obj);
   //obj = req.app.locals.Mdm.import_document(obj, "import")
