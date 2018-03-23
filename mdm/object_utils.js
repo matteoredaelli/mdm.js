@@ -137,7 +137,7 @@ exports.add_key = function(obj, key, value, policy="no_overwrite", sep=",") {
       obj[key] = new_value
     }
     break;
-    case "no_overwrite_":
+    case "no_overwrite":
     default:
     if ((! (key in obj))) {
       obj[key] = new_value
@@ -252,13 +252,10 @@ exports.keys_replace = function(obj, filter, value) {
     var v = obj[key];
     if ( (!filter.keys || key.match(filter.keys))) {
        switch(new_value) {
-         case "true":
          case true:
-         obj[key] = true
-         break;
-         case "false":
          case false:
-         obj[key] = false
+         case null:
+         obj[key] = new_value
          break;
         default:
          let new_key = key.replace(filter.values, new_value)

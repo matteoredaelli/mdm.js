@@ -26,10 +26,10 @@ class Audit {
     this.fields_list = fields_list
     console.debug(db.dbname + ": " + fields_list)
 
-    console.log("activating logging for database <audit> PUT actions");
-    this.db.db.on('put', function (key, value) {
-       console.debug('Inserted', { key, value })
-    })
+    // console.log("activating logging for database <audit> PUT actions");
+    // this.db.db.on('put', function (key, value) {
+    //    console.debug('Inserted', { key, value })
+    // })
 
   }
 
