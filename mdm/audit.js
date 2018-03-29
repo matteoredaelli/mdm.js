@@ -40,7 +40,7 @@ class Audit {
     return key
   }
 
-  add_key_if_new(key) {
+  add_key_if_new(key, logging=false) {
     var self = this
     this.db.load_raw(key)
       .then(function (obj) {
@@ -48,9 +48,11 @@ class Audit {
       })
       .catch(function (err) {
         console.error(err);
-        self.log(key)
-        .then(function (obj) {  console.log(obj);} )
-        .catch(function (err) { console.error(err); });
+        if (loggging) {
+          self.log(key)
+          .then(function (obj) {  console.log(obj);} )
+          .catch(function (err) { console.error(err); });
+        }
         return self.db.save_raw(key, Date.now())
       })
   }

@@ -43,6 +43,7 @@ steps:
         action:
           command: values_replace
           param1: ''
+        ## remove strange_characterts anywhere
       - filter:
           values: /['"\(\)]+/i
         action:
