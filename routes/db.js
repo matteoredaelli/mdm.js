@@ -82,6 +82,9 @@ router.get('/export/:db', function(req, res, next) {
     var stream = req.app.locals.Mdm.db[req.params.db].db.createValueStream()
 
     stream.on('data', function (data) {
+      if (result === "") {
+        result = result + Object.keys(data).join(";") + "\n";
+      }
       result = result + Object.values(data).join(";") + "\n";
     });
     stream.on('end', function() {

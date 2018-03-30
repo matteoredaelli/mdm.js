@@ -206,7 +206,7 @@ steps:
             param1: VAN
         - filter:
             keys: /^vehicle$/i
-            values: /^4x4|OFF[- ]?ROAD$/i
+            values: /^4x4|OFF[- ]?ROAD/i
           action:
             command: values_replace
             param1: SUV

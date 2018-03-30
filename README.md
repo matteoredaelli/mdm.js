@@ -14,5 +14,10 @@ yet an other Opensource Master Data Management system
    run the app:
      $ DEBUG=mdm.js:* npm start
 
-curl -XPOST -d '{"A":"z"}' -H "Content-Type: application/json" http://localhost:3000/doc/normalize/before_import
+
+curl -XPOST http://localhost:3000/db/step/import/append
+curl -XPOST http://localhost:3000/db/step/append/merge
+curl -XPOST http://localhost:3000/db/step/append/merge
+curl -XPOST http://localhost:3000/db/step/merge/export
+curl -XGET  http://localhost:3000/db/export/export > export.csv
 
