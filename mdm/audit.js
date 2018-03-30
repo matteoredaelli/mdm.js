@@ -48,7 +48,7 @@ class Audit {
       })
       .catch(function (err) {
         console.error(err);
-        if (loggging) {
+        if (logging) {
           self.log(key)
           .then(function (obj) {  console.log(obj);} )
           .catch(function (err) { console.error(err); });
