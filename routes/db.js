@@ -72,7 +72,7 @@ router.post('/step/:from/:to', function(req, res, next) {
 });
 
 
-router.get('/export/:db', function(req, res, next) {
+router.get('/export/csv/:db', function(req, res, next) {
   //console.debug('\x1b[33m%s\x1b[0m: ', obj);
   //obj = req.app.locals.Mdm.import_document(obj, "import")
   //const tot = req.app.locals.Mdm.db[req.params.db].count(res.send)
@@ -95,5 +95,24 @@ router.get('/export/:db', function(req, res, next) {
   //res.send({"count": tot});
 });
 
+router.get('/export/kv/:db', function(req, res, next) {
+  //console.debug('\x1b[33m%s\x1b[0m: ', obj);
+  //obj = req.app.locals.Mdm.import_document(obj, "import")
+  //const tot = req.app.locals.Mdm.db[req.params.db].count(res.send)
+
+    var result = "";
+
+    var stream = req.app.locals.Mdm.db[req.params.db].db.createReadStream()
+
+    stream.on('data', function (data) {
+      result = result + data.key + ";" + data.value + "\n";
+    });
+    stream.on('end', function() {
+      console.debug('export: stream END' )
+      res.setHeader('Content-Type', 'text/csv');
+      res.send(result);
+    })
+  //res.send({"count": tot});
+});
 
 module.exports = router;

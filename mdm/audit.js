@@ -40,7 +40,7 @@ class Audit {
     return key
   }
 
-  add_key_if_new(key, logging=false) {
+  add_key_if_new(key, logging=true) {
     var self = this
     this.db.load_raw(key)
       .then(function (obj) {
