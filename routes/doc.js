@@ -40,7 +40,7 @@ router.post('/import', function(req, res, next) {
 
 router.post('/normalize/:step', function(req, res, next) {
   console.trace(req.body);
-  const obj = obj_utils.normalize(req.body, req.app.locals.Mdm.settings.steps[req.params.step])
+  const obj = obj_utils.normalize(req.body, req.app.locals.Mdm.settings.steps[req.params.step].rules, true)
   res.send(obj);
 });
 

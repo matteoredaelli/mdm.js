@@ -160,6 +160,11 @@ steps:
             command: values_replace
             param1: false
         - filter:
+            values: /^null$/i
+          action:
+            command: values_replace
+            param1: null
+        - filter:
             keys: /^brand$/i
             values: /[-_]/i
           action:
@@ -217,14 +222,14 @@ steps:
             param1:
         - filter:
             keys: /^description$/i
-            values: / MFS|FSL|PROTEZIONE|FRP?/i
+            values: / (MFS|FSL|PROTEZIONE|FRP?)/i
           action:
             command: key_add
             param1: mfs
             param2: true
         - filter:
             keys: /^description$/i
-            values: / DSST|EMT|HRFS|MOExtended|PAX|RUNFLAT|R-F|RFT|ROF|SSR|(RUN FLAT)|TRF|ZRP|ZP|ZPS/i
+            values: / (DSST|EMT|HRFS|MOExtended|PAX|RUNFLAT|R-F|RFT|ROF|SSR|(RUN FLAT)|TRF|ZRP|ZP|ZPS)/i
           action:
             command: key_add
             param1: runflat
@@ -301,6 +306,7 @@ steps:
       fields:
         ean: [string]
         brand: [string]
+        crawled: [string, multivalue]
         currency: [string, multivalue]
         description: [string, multivalue]
         extra: [string, multivalue]

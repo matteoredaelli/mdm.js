@@ -233,7 +233,7 @@ exports.keys_delete = function(obj, filter) {
 };
 
 //policy: overwrite|append,no_overwrite
-exports.key_add = function(obj, filter, new_key, value, policy="no_overwrite", sep=",") {
+exports.key_add = function(obj, filter, new_key, value, policy="overwrite", sep=",") {
   var self = this;
   Object.keys(obj).forEach(function (key) {
     var v = obj[key];
@@ -298,14 +298,18 @@ exports.values_replace = function(obj, filter, new_value, replace_all_string=fal
   return obj;
 };
 
-exports.normalize = function(obj, rules)  {
+exports.normalize = function(obj, rules, debug=false)  {
   var self = this;
+  console.debug(JSON.stringify(rules))
   rules.forEach( function(f) {
     let keys = f.filter && f.filter.keys ? eval(f.filter.keys) : /^.*$/;
     let values = f.filter && f.filter.values ? eval(f.filter.values) : /^.*$/;
     let filter = {keys: keys, values: values};
     console.debug('\x1b[33m%s\x1b[0m: ',"Normalize: entering new rule='" + f.action.command + "' with filters: keys='" + keys + "', values='" + values);
-        console.debug('\x1b[33m%s\x1b[0m: ',"  before the document has " + Object.keys(obj).length + ' keys');
+    console.debug('\x1b[33m%s\x1b[0m: ',"  before the document has " + Object.keys(obj).length + ' keys');
+    if (debug) {
+      console.debug(JSON.stringify(obj))
+    }
     switch(f.action.command) {
       case "key_add":
       obj = self.key_add(obj, filter, f.action.param1, f.action.param2, f.action.param3);

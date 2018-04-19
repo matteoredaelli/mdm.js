@@ -17,7 +17,6 @@ yet an other Opensource Master Data Management system
 
 curl -XPOST http://localhost:3000/db/step/import/append
 curl -XPOST http://localhost:3000/db/step/append/merge
-curl -XPOST http://localhost:3000/db/step/append/merge
 curl -XPOST http://localhost:3000/db/step/merge/export
 curl -XGET  http://localhost:3000/db/export/csv/export > export.csv
 curl -XGET  http://localhost:3000/db/export/kv/audit > audit.csv
