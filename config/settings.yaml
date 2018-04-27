@@ -69,22 +69,72 @@ steps:
           command: keys_to_lowercase
           param1:
       - filter:
-          keys: /^taloudellisuus$/i
+          keys: /^Hersteller$/i
+        action:
+          command: keys_replace
+          param1: brand
+      - filter:
+          keys: /^ArtikelBezeichnung$/i
+        action:
+          command: keys_replace
+          param1: description
+      - filter:
+          keys: /^Preis$/i
+        action:
+          command: keys_replace
+          param1: price
+      - filter:
+          keys: /^profil$/i
+        action:
+          command: keys_replace
+          param1: product
+      - filter:
+          keys: /^reifenbreite|larghezza$/i
+        action:
+          command: keys_replace
+          param1: width
+      - filter:
+          keys: /^querschnitt|altezza$/i
+        action:
+          command: keys_replace
+          param1: series
+      - filter:
+          keys: /^ReifenDurchmesser|diametro|diameter$/i
+        action:
+          command: keys_replace
+          param1: rim
+      - filter:
+          keys: /^Speedindex$/i
+        action:
+          command: keys_replace
+          param1: speed_index
+      - filter:
+          keys: /^Loadindex$/i
+        action:
+          command: keys_replace
+          param1: load_index
+      - filter:
+          keys: /^Warengruppe1$/i
+        action:
+          command: keys_replace
+          param1: seasonality
+      - filter:
+          keys: /^EANCode$/i
+        action:
+          command: keys_replace
+          param1: ean
+      - filter:
+          keys: /^(Kraftstoffeffizienzklasse|taloudellisuus|labelfuel|label fuel)$/i
         action:
           command: keys_replace
           param1: label_fuel
       - filter:
-          keys: /^(labelfuel|label fuel)$/i
-        action:
-          command: keys_replace
-          param1: label_fuel
-      - filter:
-          keys: /^vierintämelu$/i
+          keys: /^vierintämelu|ExternesRollgeraeusch$/i
         action:
           command: keys_replace
           param1: label_noise
       - filter:
-          keys: /^märkäpito$/i
+          keys: /^märkäpito|Nasshaftungsklasse$/i
         action:
           command: keys_replace
           param1: label_wet
@@ -124,20 +174,10 @@ steps:
           command: keys_replace
           param1: studded
       - filter:
-          keys: /^diametro|diameter$/i
+          keys: /^ArtikelNr$/i
         action:
           command: keys_replace
-          param1: rim
-      - filter:
-          keys: /^larghezza$/i
-        action:
-          command: keys_replace
-          param1: width
-      - filter:
-          keys: /^altezza$/i
-        action:
-          command: keys_replace
-          param1: series
+          param1: id
       - filter:
           keys: /brand|product|description|size|vehicle|seasonality|label_fuel|label_noise|label_wet|type|speed_index/i
           values:
@@ -211,15 +251,29 @@ steps:
             param1: VAN
         - filter:
             keys: /^vehicle$/i
-            values: /^4x4|OFF[- ]?ROAD/i
+            values: /^4x4|OFF[- ]?ROAD|SUV/i
           action:
             command: values_replace
             param1: SUV
         - filter:
-            keys: /^url|test$/i
+            keys: /^url|ProduktURL|test|ArtBez2|Zusatz|Testurteil|Medium|Ausgabe|Stueckzahl|Preisinfo|MwSt|Versandkosten|Zahlarten|HinweisFinanzierung|Lieferzeit|Versender|Warengruppe2|Preiskategorie|Bestellinfo/i
           action:
             command: keys_delete
             param1:
+        - filter:
+            keys: /^description$/i
+            values: /front/i
+          action:
+            command: key_add
+            param1: front_rear
+            param2: front
+        - filter:
+            keys: /^description$/i
+            values: /rear/i
+          action:
+            command: key_add
+            param1: front_rear
+            param2: rear
         - filter:
             keys: /^description$/i
             values: / (MFS|FSL|PROTEZIONE|FRP?)/i
@@ -311,6 +365,7 @@ steps:
         description: [string, multivalue]
         extra: [string, multivalue]
         extra_load: [string]
+        front_rear: [string]
         label_fuel: [string]
         label_noise: [string]
         label_wet: [string]

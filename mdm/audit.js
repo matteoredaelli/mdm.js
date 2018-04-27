@@ -71,7 +71,7 @@ class Audit {
   }
 
   log(text) {
-    const key = new Date().toJSON().slice(0,10).replace(/-/g,'');
+    const key = 'LOG' + new Date().toJSON().slice(0,10).replace(/-/g,'');
     return this.append(key, text)
   }
 
