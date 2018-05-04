@@ -57,22 +57,22 @@ class Audit {
       })
   }
 
-  append(key, text, sep="\n") {
+  push(key, text) {
     var self = this
     this.db.load_raw(key)
       .then(function (obj) {
         console.debug(key + " is already in the database")
-        return self.db.save_raw(key, obj + sep + text)
+        return self.db.save_raw(key, obj.push(text))
       })
       .catch(function (err) {
         console.error(err);
-        return self.db.save_raw(key, text)
+        return self.db.save_raw(key, [text])
       })
   }
 
   log(text) {
     const key = 'LOG' + new Date().toJSON().slice(0,10).replace(/-/g,'');
-    return this.append(key, text)
+    return this.push(key, text)
   }
 
   save_new_values(obj) {

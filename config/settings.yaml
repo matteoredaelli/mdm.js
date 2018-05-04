@@ -104,6 +104,11 @@ steps:
           command: keys_replace
           param1: rim
       - filter:
+          keys: /^valuta|Waehrung$/i
+        action:
+          command: keys_replace
+          param1: currency
+      - filter:
           keys: /^Speedindex$/i
         action:
           command: keys_replace
@@ -336,7 +341,8 @@ steps:
           action:
             command: key_add
             param1: oe_marks
-            param2: true
+            param2: \1
+            param3: true
         - filter:
             keys: /^price$/i
             values: /\$/i
@@ -384,6 +390,6 @@ steps:
         source: [string, multivalue]
         speed_index: [string]
         studdable: [string]
-        studdle: [string]
+        studded: [string]
         vehicle: [string, multivalue]
         width: [string]

@@ -52,6 +52,8 @@ router.post('/step/:from/:to', function(req, res, next) {
   //obj = req.app.locals.Mdm.import_document(obj, "import")
   //const tot = req.app.locals.Mdm.db[req.params.db].count(res.send)
 
+    req.setTimeout(0) 
+
     var result = 0;
     const from = req.params.from;
     const to   = req.params.to;
@@ -76,6 +78,8 @@ router.get('/export/csv/:db', function(req, res, next) {
   //console.debug('\x1b[33m%s\x1b[0m: ', obj);
   //obj = req.app.locals.Mdm.import_document(obj, "import")
   //const tot = req.app.locals.Mdm.db[req.params.db].count(res.send)
+
+    req.setTimeout(0) 
 
     var result = "";
 

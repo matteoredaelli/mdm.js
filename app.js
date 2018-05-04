@@ -32,7 +32,9 @@ var route_values = require('./routes/values');
 
 var app = express();
 
+
 const settings = require("./mdm/settings");
+
 
 var mdm = require('./mdm/mdm');
 app.locals.Mdm = new mdm(settings)
