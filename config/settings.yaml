@@ -13,6 +13,7 @@ mdm:
   unique_keys:
     - [ean]
     - [brand, manufacturer_number]
+  timestamp_key: crawled
 steps:
   import:
     keys:
@@ -45,7 +46,7 @@ steps:
           param1: ''
         ## remove strange_characterts anywhere
       - filter:
-          values: /['"\(\)]+/i
+          values: /['"\(\)\n\r]+/i
         action:
           command: values_replace
           param1: ''
@@ -104,7 +105,7 @@ steps:
           command: keys_replace
           param1: rim
       - filter:
-          keys: /^valuta|Waehrung$/i
+          keys: /^valuta|Waehrung|währung$/i
         action:
           command: keys_replace
           param1: currency
@@ -335,14 +336,6 @@ steps:
             command: key_add
             param1: studdable
             param2: true
-        - filter:
-            keys: /^description$/i
-            values: / ?(MOE|N0|N1|MO|AO|RO\d|NH|MCLAREN|LRO|F0\d|\*)/i
-          action:
-            command: key_add
-            param1: oe_marks
-            param2: \1
-            param3: true
         - filter:
             keys: /^price$/i
             values: /\$/i

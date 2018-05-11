@@ -53,6 +53,19 @@ class DB{
     });
   }
 
+
+save_raw_if_new(id, doc) {
+      var self = this
+      this.db.get(id)
+        .then(function (obj) {
+          console.log(self.dbdesc + "save_raw_if_new: altrady exixts, not saving")
+        })
+        .catch(function (err) {
+          console.error(err);
+          return self.save_raw(id, doc)
+        })
+    }
+
   load_raw(id) {
     console.debug(this.dbdesc + "load_raw: with id=" + id)
     // this.db.get(id)

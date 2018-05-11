@@ -35,7 +35,7 @@ class Mdm {
       "export": new mdm_db(path, "export"),
       "audit":  new mdm_db(path, "audit")
     }
-    this.audit = new mdm_audit(this.settings.audit, this.db.audit)
+    this.audit = new mdm_audit(this.settings.audit, this.db.audit, this.settings.mdm.timestamp_key)
 
     // console.log("activating logging for database <import> PUT actions");
     // this.db.import.db.on('put', function (key, value) {

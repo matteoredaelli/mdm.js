@@ -300,7 +300,8 @@ exports.values_replace = function(obj, filter, new_value, replace_all_string=fal
 
 exports.normalize = function(obj, rules, debug=false)  {
   var self = this;
-  console.debug(JSON.stringify(rules))
+  console.debug("Obj = " + JSON.stringify(obj))
+  console.debug("Rules = " + JSON.stringify(rules))
   rules.forEach( function(f) {
     let keys = f.filter && f.filter.keys ? eval(f.filter.keys) : /^.*$/;
     let values = f.filter && f.filter.values ? eval(f.filter.values) : /^.*$/;

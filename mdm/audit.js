@@ -21,9 +21,10 @@ const yaml = require('js-yaml');
 const fs   = require('fs');
 
 class Audit {
-  constructor(fields_list, db) {
+  constructor(fields_list, db, timestamp_key) {
     this.db = db
     this.fields_list = fields_list
+    this.timestamp_key = timestamp_key
     console.debug(db.dbname + ": " + fields_list)
 
     // console.log("activating logging for database <audit> PUT actions");
@@ -33,28 +34,11 @@ class Audit {
 
   }
 
-  get_key(keys, values, sep1 = "|", sep2="+") {
+  get_key(keys, values, sep1 = "!", sep2=";") {
     const key =  keys.join(sep1) + sep2 + values.join(sep1)
     console.debug("get_key from keys=" + keys + " and values=" + values)
     console.debug("  key=" + key)
     return key
-  }
-
-  add_key_if_new(key, logging=true) {
-    var self = this
-    this.db.load_raw(key)
-      .then(function (obj) {
-        console.debug(key + " is already in the database: nothing to do")
-      })
-      .catch(function (err) {
-        console.error(err);
-        if (logging) {
-          self.log(key)
-          .then(function (obj) {  console.log(obj);} )
-          .catch(function (err) { console.error(err); });
-        }
-        return self.db.save_raw(key, Date.now())
-      })
   }
 
   push(key, text) {
@@ -62,7 +46,8 @@ class Audit {
     this.db.load_raw(key)
       .then(function (obj) {
         console.debug(key + " is already in the database")
-        return self.db.save_raw(key, obj.push(text))
+        obj.push(text)
+        return self.db.save_raw(key, obj)
       })
       .catch(function (err) {
         console.error(err);
@@ -70,26 +55,28 @@ class Audit {
       })
   }
 
-  log(text) {
-    const key = 'LOG' + new Date().toJSON().slice(0,10).replace(/-/g,'');
+  log(text, day) {
+    const key = 'LOG' + day // new Date().toJSON().slice(0,10).replace(/-/g,'');
     return this.push(key, text)
   }
 
   save_new_values(obj) {
     var self = this
+    var day = obj.hasOwnProperty(this.timestamp_key) ? obj[this.timestamp_key] : new Date().toJSON();
+    day = day.slice(0,10).replace(/-/g,'');
     var values = {}
     this.fields_list.forEach(function(keys) {
       console.debug("keys=" + keys)
-      if (keys == '_FIELD_') {
+      if (keys == ['_FIELD_']) {
         // saving objec keys
         Object.keys(obj).forEach(function(k,v) {
           let key = self.get_key(keys, [k])
-          self.add_key_if_new(key)
+          self.db.add_key_if_new(key, day)
         })
       } else {
         values = keys.map( x => (x in obj) ? obj[x] : "NULL");
         let key = self.get_key(keys, values)
-        self.add_key_if_new(key)
+        self.db.save_raw_if_new(key, day)
       }
     });
   }

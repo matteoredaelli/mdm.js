@@ -35,6 +35,10 @@ var app = express();
 
 const settings = require("./mdm/settings");
 
+process.on('unhandledRejection', (reason, p) => {
+  console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
+  // application specific logging, throwing an error, or other logic here
+});
 
 var mdm = require('./mdm/mdm');
 app.locals.Mdm = new mdm(settings)
