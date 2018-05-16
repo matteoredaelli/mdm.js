@@ -60,23 +60,20 @@ class Audit {
     return this.push(key, text)
   }
 
-  save_new_values(obj) {
-    var self = this
-    var day = obj.hasOwnProperty(this.timestamp_key) ? obj[this.timestamp_key] : new Date().toJSON();
-    day = day.slice(0,10).replace(/-/g,'');
+  save_new_values(obj, sep="|") {
+    var self = this;
     var values = {}
     this.fields_list.forEach(function(keys) {
       console.debug("keys=" + keys)
       if (keys == ['_FIELD_']) {
         // saving objec keys
         Object.keys(obj).forEach(function(k,v) {
-          let key = self.get_key(keys, [k])
-          self.db.add_key_if_new(key, day)
+          values = [k]
+          self.db.save_raw_set_add("_FIELDS_", k)
         })
       } else {
         values = keys.map( x => (x in obj) ? obj[x] : "NULL");
-        let key = self.get_key(keys, values)
-        self.db.save_raw_if_new(key, day)
+        self.db.save_raw_set_add(keys.join(sep), values.join(sep))
       }
     });
   }

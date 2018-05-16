@@ -22,11 +22,18 @@ var router = express.Router();
 
 var obj_utils = require('../mdm/object_utils');
 
+function Set_toJSON(key, value) {
+  if (typeof value === 'object' && value instanceof Set) {
+    return [...value];
+  }
+  return value;
+}
+
 router.get('/:id/:step', function(req, res, next) {
   console.debug('\x1b[33m%s\x1b[0m: ', 'getting id=' + req.params.id + ' for step=' + req.params.step);
   //obj = req.app.locals.Mdm.import_document(obj, "import")
   req.app.locals.Mdm.db[req.params.step].load_obj(req.params.id)
-    .then(function (obj) {  console.log(obj); res.send(obj);} )
+    .then(function (obj) {  console.log(obj); res.send(JSON.stringify(obj, Set_toJSON));} )
     .catch(function (err) { console.error(err); res.send({}); });
 });
 

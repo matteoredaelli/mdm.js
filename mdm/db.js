@@ -54,7 +54,7 @@ class DB{
   }
 
 
-save_raw_if_new(id, doc) {
+  save_raw_if_new(id, doc) {
       var self = this
       this.db.get(id)
         .then(function (obj) {
@@ -63,6 +63,18 @@ save_raw_if_new(id, doc) {
         .catch(function (err) {
           console.error(err);
           return self.save_raw(id, doc)
+        })
+  }
+
+  save_raw_set_add(id, doc) {
+      var self = this
+      this.db.get(id)
+        .then(function (obj) {
+          self.save_raw(id, obj.add(doc))
+        })
+        .catch(function (err) {
+          console.error(err);
+          return self.save_raw(id, new Set(doc))
         })
     }
 
