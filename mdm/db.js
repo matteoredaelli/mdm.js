@@ -70,7 +70,8 @@ class DB{
       var self = this
       this.db.get(id)
         .then(function (obj) {
-          self.save_raw(id, obj.add(doc))
+          obj.add(doc)
+          self.save_raw(id, obj)
         })
         .catch(function (err) {
           console.error(err);

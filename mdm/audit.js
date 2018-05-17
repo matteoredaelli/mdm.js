@@ -69,7 +69,7 @@ class Audit {
         // saving objec keys
         Object.keys(obj).forEach(function(k,v) {
           values = [k]
-          self.db.save_raw_set_add("_FIELDS_", k)
+          self.db.save_raw_set_add("_FIELD_", k)
         })
       } else {
         values = keys.map( x => (x in obj) ? obj[x] : "NULL");

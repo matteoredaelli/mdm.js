@@ -318,6 +318,13 @@ steps:
         - filter:
             keys: /^description$/i
             values: / XL/i
+        - filter:
+            keys: /^description$/i
+            values: / ?(MOE|N0|N1|MO|AO|RO\d|NH|MCLAREN|LRO|F0\d|\*)/i
+          action:
+            command: key_add
+            param1: oe_marks
+            param2: true            
           action:
             command: key_add
             param1: extra_load
