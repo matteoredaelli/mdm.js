@@ -282,21 +282,21 @@ steps:
             param2: rear
         - filter:
             keys: /^description$/i
-            values: / (MFS|FSL|PROTEZIONE|FRP?)/i
+            values: /\b(MFS|FSL|PROTEZIONE|FRP?)\b/i
           action:
             command: key_add
             param1: mfs
             param2: true
         - filter:
             keys: /^description$/i
-            values: / (DSST|EMT|HRFS|MOExtended|PAX|RUNFLAT|R-F|RFT|ROF|SSR|(RUN FLAT)|TRF|ZRP|ZP|ZPS)/i
+            values: /\b(DSST|EMT|HRFS|MOExtended|PAX|RUNFLAT|R-F|RFT|ROF|SSR|(RUN FLAT)|TRF|ZRP|ZP|ZPS)\b/i
           action:
             command: key_add
             param1: runflat
             param2: true
         - filter:
             keys: /^description$/i
-            values: / (SIL|ACO|ACOUSTIC|NST|SOUND|SILENT)/i
+            values: /\b(SIL|ACO|ACOUSTIC|NST|SOUND|SILENT)\b/i
           action:
             command: key_add
             param1: ncs
@@ -310,28 +310,28 @@ steps:
             param2: WINTER
         - filter:
             keys: /^description$/i
-            values: / (s-i|sealing|cs)/i
+            values: /\b(s-i|sealing|cs)\b/i
           action:
             command: key_add
             param1: seal_inside
             param2: true
         - filter:
             keys: /^description$/i
-            values: / XL/i
-        - filter:
-            keys: /^description$/i
-            values: / ?(MOE|N0|N1|MO|AO|RO\d|NH|MCLAREN|LRO|F0\d|\*)/i
-          action:
-            command: key_add
-            param1: oe_marks
-            param2: true            
+            values: /\bXL\b/i
           action:
             command: key_add
             param1: extra_load
             param2: true
         - filter:
             keys: /^description$/i
-            values: /studded|chiodat|NASTARENGAS|SPIKE/i
+            values: /\b?(MOE|N0|N1|MO|AO|RO\d|NH|MCLAREN|LRO|F0\d|\*)\b/i
+          action:
+            command: key_add
+            param1: oe_marks
+            param2: true
+        - filter:
+            keys: /^description$/i
+            values: /\bstudded|chiodat|NASTARENGAS|SPIKE/i
           action:
             command: key_add
             param1: studded
