@@ -17,7 +17,8 @@
 
 "use strict";
 
-const custom_module  = require('../custom_module');
+const custom_module_name  = 'custom_module_' + process.env.project;
+const custom_module  = require('../' + custom_module_name);
 
 var self  = this;
 
@@ -341,8 +342,8 @@ exports.normalize = function(obj, rules, debug=false)  {
       case "keys_with_only_letters_numbers_and_underscores":
       obj = self.keys_with_only_letters_numbers_and_underscores(obj, filter)
       break;
-      case "custom_function":
-      obj = eval("custom_module." + f.action.param1 + "(obj)");
+      case "custom_module":
+      obj = eval(custom_module_name + "." + f.action.param1 + "(obj)");
       break;
       default:
       console.log("   unknown command "+ f.action.command);

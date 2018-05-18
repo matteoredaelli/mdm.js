@@ -19,7 +19,7 @@
 
 const yaml = require('js-yaml');
 const fs   = require('fs');
-const settings = yaml.safeLoad(fs.readFileSync("config/settings.yaml", "utf8"))
+const filename = "config_" + process.env.project + ".yaml"
+const settings = yaml.safeLoad(fs.readFileSync(filename, "utf8"))
 
 module.exports = settings;
-
