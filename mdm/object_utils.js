@@ -17,6 +17,8 @@
 
 "use strict";
 
+const custom_module  = require('../custom_module');
+
 var self  = this;
 
 exports.merge_objects = function(objList, skip_keys, source_field, start={} ) {
@@ -338,6 +340,9 @@ exports.normalize = function(obj, rules, debug=false)  {
       break;
       case "keys_with_only_letters_numbers_and_underscores":
       obj = self.keys_with_only_letters_numbers_and_underscores(obj, filter)
+      break;
+      case "custom_function":
+      obj = eval("custom_module." + f.action.param1 + "(obj)");
       break;
       default:
       console.log("   unknown command "+ f.action.command);

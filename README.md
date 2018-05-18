@@ -11,6 +11,8 @@ yet an other Opensource Master Data Management system
 
 ## setup
 
+   cp custom_module.js.sample custom_module.js
+
    run the app:
      $ DEBUG=mdm.js:* npm start
 

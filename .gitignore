@@ -58,3 +58,4 @@ typings/
 .env
 
 public/data
+custom_module.js
