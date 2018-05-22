@@ -324,7 +324,7 @@ steps:
             param2: true
         - filter:
             keys: /^description$/i
-            values: /\b?(MOE|N0|N1|MO|AO|RO\d|NH|MCLAREN|LRO|F0\d|\*)\b/i
+            values: /\b(MOE|N0|N1|MO|AO|RO\d|NH|MCLAREN|LRO|F0\d|\*)\b/i
           action:
             command: key_add
             param1: oe_marks

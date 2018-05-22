@@ -17,16 +17,7 @@
 
 "use strict";
 
-const yaml = require('js-yaml');
-const fs   = require('fs');
-var settings = {}
-
-try {
-  const filename = "config_" + process.env.project + ".yaml"
-  settings = yaml.safeLoad(fs.readFileSync("config/settings.yaml", "utf8"))
-  console.log(settings);
-} catch (e) {
-  console.log(e);
+exports.process = function(obj) {
+  console.debug("process : begin")
+  return obj;
 }
-
-module.exports = settings;

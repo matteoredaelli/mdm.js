@@ -67,8 +67,7 @@ class Audit {
       console.debug("keys=" + keys)
       if (keys == ['_FIELD_']) {
         // saving objec keys
-        Object.keys(obj).forEach(function(k,v) {
-          values = [k]
+        Object.keys(obj).forEach(function(k,ix) {
           self.db.save_raw_set_add("_FIELD_", k)
         })
       } else {
