@@ -19,7 +19,13 @@
 
 const yaml = require('js-yaml');
 const fs   = require('fs');
-const settings = yaml.safeLoad(fs.readFileSync("config/settings.yaml", "utf8"))
+var settings = {}
+
+try {
+  settings = yaml.safeLoad(fs.readFileSync("config/settings.yaml", "utf8"))
+  console.log(settings);
+} catch (e) {
+  console.log(e);
+}
 
 module.exports = settings;
-
