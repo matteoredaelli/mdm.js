@@ -23,7 +23,7 @@ var settings = {}
 
 try {
   const filename = "config_" + process.env.project + ".yaml"
-  settings = yaml.safeLoad(fs.readFileSync("config/settings.yaml", "utf8"))
+  settings = yaml.safeLoad(fs.readFileSync(filename, "utf8"))
   console.log(settings);
 } catch (e) {
   console.log(e);
