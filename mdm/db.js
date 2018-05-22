@@ -72,8 +72,8 @@ class DB{
         .then(function (obj) {
           if ( ! obj.includes(doc)) {
             obj.push(doc);
+            return self.save_raw(id, obj)
           }
-          self.save_raw(id, obj)
         })
         .catch(function (err) {
           console.error(err);

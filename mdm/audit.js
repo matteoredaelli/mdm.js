@@ -65,7 +65,7 @@ class Audit {
     var values = {}
     this.fields_list.forEach(function(keys) {
       console.debug("keys=" + keys)
-      if (keys == ['_FIELD_']) {
+      if (keys[0] == '_FIELD_') {
         // saving objec keys
         Object.keys(obj).forEach(function(k,ix) {
           self.db.save_raw_set_add("_FIELD_", k)

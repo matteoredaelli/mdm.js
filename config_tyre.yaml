@@ -105,7 +105,7 @@ steps:
           command: keys_replace
           param1: rim
       - filter:
-          keys: /^valuta|Waehrung|währung$/i
+          keys: /^valuta|Waehrung|währung/i
         action:
           command: keys_replace
           param1: currency
@@ -119,11 +119,6 @@ steps:
         action:
           command: keys_replace
           param1: load_index
-      - filter:
-          keys: /^Warengruppe1$/i
-        action:
-          command: keys_replace
-          param1: seasonality
       - filter:
           keys: /^EANCode$/i
         action:
@@ -245,6 +240,12 @@ steps:
             param2: true # replace_all string
         - filter:
             keys: /^vehicle$/i
+            values: /moto|mofa|scooter$/i
+          action:
+            command: values_replace
+            param1: MOTO
+        - filter:
+            keys: /^vehicle$/i
             values: /^auto|PKW|PA$/i
           action:
             command: values_replace
@@ -257,12 +258,47 @@ steps:
             param1: VAN
         - filter:
             keys: /^vehicle$/i
-            values: /^4x4|OFF[- ]?ROAD|SUV/i
+            values: /4x4|OFF[- ]?ROAD|SUV/i
           action:
             command: values_replace
             param1: SUV
         - filter:
-            keys: /^url|ProduktURL|test|ArtBez2|Zusatz|Testurteil|Medium|Ausgabe|Stueckzahl|Preisinfo|MwSt|Versandkosten|Zahlarten|HinweisFinanzierung|Lieferzeit|Versender|Warengruppe2|Preiskategorie|Bestellinfo/i
+            keys: /^Warengruppe1$/i
+            values: /4x4|OFF[- ]?ROAD|SUV/i
+          action:
+            command: key_add
+            param1: vehicle
+            param2: SUV
+        - filter:
+            keys: /^Warengruppe1$/i
+            values: /CAR|tourisme|UTILITAIRE/i
+          action:
+            command: key_add
+            param1: vehicle
+            param2: CAR
+        - filter:
+            keys: /^Warengruppe1$/i
+            values: /MOTO|SCOOTER|MOFA/i
+          action:
+            command: key_add
+            param1: vehicle
+            param2: MOTO
+        - filter:
+            keys: /^Warengruppe1$/i
+            values: /SOMMER|SUMMER/i
+          action:
+            command: key_add
+            param1: seasonality
+            param2: SUMMER
+        - filter:
+            keys: /^Warengruppe1$/i
+            values: /WINTER/i
+          action:
+            command: key_add
+            param1: seasonality
+            param2: WINTER
+        - filter:
+            keys: /^url|ProduktURL|test|Warengruppe1|ArtBez2|Zusatz|Testurteil|Medium|Ausgabe|Stueckzahl|Preisinfo|MwSt|Versandkosten|Zahlarten|HinweisFinanzierung|Lieferzeit|Versender|Warengruppe2|Preiskategorie|Bestellinfo/i
           action:
             command: keys_delete
             param1:
