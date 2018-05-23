@@ -58,7 +58,7 @@ class Audit {
         })
       } else {
         values = keys.map( x => (x in obj) ? obj[x] : "NULL");
-        self.db.save_raw_push(keys.join(sep), values.join(sep), true)
+        self.db.save_raw_push('_KEY_' + keys.join(sep), values.join(sep), true)
       }
     });
   }

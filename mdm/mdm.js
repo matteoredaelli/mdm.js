@@ -105,7 +105,7 @@ class Mdm {
         obj_new[local_id] = obj;
         obj_new["_LASTUPDATE_"] = ts
         obj_new["_CREATED_"] = ts
-        self.audit.log(id + " added", ts.slice(0,10).replace(/-/g,''))
+        self.audit.log("new item:" + id, ts.slice(0,10).replace(/-/g,''))
         return self.db[step].save_raw(id, obj_new)
       })
     } // end else
