@@ -41,23 +41,9 @@ class Audit {
     return key
   }
 
-  push(key, text) {
-    var self = this
-    this.db.load_raw(key)
-      .then(function (obj) {
-        console.debug(key + " is already in the database")
-        obj.push(text)
-        return self.db.save_raw(key, obj)
-      })
-      .catch(function (err) {
-        console.error(err);
-        return self.db.save_raw(key, [text])
-      })
-  }
-
   log(text, day) {
-    const key = 'LOG' + day // new Date().toJSON().slice(0,10).replace(/-/g,'');
-    return this.push(key, text)
+    const key = '_LOG_' + day // new Date().toJSON().slice(0,10).replace(/-/g,'');
+    return this.db.save_raw_push(key, text, false)
   }
 
   save_new_values(obj, sep="|") {
@@ -68,11 +54,11 @@ class Audit {
       if (keys[0] == '_FIELD_') {
         // saving objec keys
         Object.keys(obj).forEach(function(k,ix) {
-          self.db.save_raw_set_add("_FIELD_", k)
+          self.db.save_raw_push("_FIELD_", k, true)
         })
       } else {
         values = keys.map( x => (x in obj) ? obj[x] : "NULL");
-        self.db.save_raw_set_add(keys.join(sep), values.join(sep))
+        self.db.save_raw_push(keys.join(sep), values.join(sep), true)
       }
     });
   }

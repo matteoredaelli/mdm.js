@@ -66,11 +66,11 @@ class DB{
         })
   }
 
-  save_raw_set_add(id, doc) {
+  save_raw_push(id, doc, uniq=true) {
       var self = this
       this.db.get(id)
         .then(function (obj) {
-          if ( ! obj.includes(doc)) {
+          if ( !uniq || (! obj.includes(doc)) ) {
             obj.push(doc);
             return self.save_raw(id, obj)
           }

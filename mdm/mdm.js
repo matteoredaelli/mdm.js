@@ -90,17 +90,22 @@ class Mdm {
     if (! id) {
       console.error("Step " + step + ": missing ID keys in doc " + obj)
     } else {
+      const ts = obj[this.settings.mdm.timestamp_key];
       self.db[step].load_raw(id)
       .then(function (obj_new) {
         console.log("step_append: retreived object ")
         console.debug(obj_new)
         obj_new[local_id] = obj
+        obj_new["_LASTUPDATE_"] = day
         return self.db[step].save_raw(id, obj_new)
       })
       .catch(function (err) {
         console.error(err);
         obj_new = {}
         obj_new[local_id] = obj;
+        obj_new["_LASTUPDATE_"] = ts
+        obj_new["_CREATED_"] = ts
+        self.audit.log(id + " added", ts.slice(0,10).replace(/-/g,''))
         return self.db[step].save_raw(id, obj_new)
       })
     } // end else
