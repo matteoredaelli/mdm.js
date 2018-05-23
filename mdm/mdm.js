@@ -74,13 +74,28 @@ class Mdm {
 
   step_import(obj) {
     const step="import";
+    var self = this;
     obj = obj_utils.normalize(obj, this.settings.steps[step].rules)
     const id = this.get_document_id(obj, step)
-    this.db[step].save_raw(id, obj)
+    const ts = obj[this.settings.mdm.timestamp_key];
+    self.db[step].load_raw(id)
+    .then(function (obj_new) {
+      console.log("step_import: retreived object ")
+      console.debug(obj_new)
+      obj_new["_LASTUPDATE_"] = ts
+      return self.db[step].save_raw(id, obj_new)
+    })
+    .catch(function (err) {
+      console.error(err);
+      var obj_new = obj
+      obj_new["_LASTUPDATE_"] = ts
+      obj_new["_CREATED_"] = ts
+      return self.db[step].save_raw(id, obj_new)
+    })
   }
 
   step_append(obj) {
-    const step = "append"
+    const step = "append";
     var self = this;
     obj = obj_utils.normalize(obj, self.settings.steps[step].rules)
     this.audit.save_new_values(obj)
@@ -90,23 +105,24 @@ class Mdm {
     if (! id) {
       console.error("Step " + step + ": missing ID keys in doc " + obj)
     } else {
-      const ts = obj[this.settings.mdm.timestamp_key];
       self.db[step].load_raw(id)
       .then(function (obj_new) {
         console.log("step_append: retreived object ")
         console.debug(obj_new)
         obj_new[local_id] = obj
-        obj_new["_LASTUPDATE_"] = day
-        return self.db[step].save_raw(id, obj_new)
+        if (obj_new["_LASTUPDATE_"] < obj["_LASTUPDATE_"] ) {
+          obj_new["_LASTUPDATE_"] = obj["_LASTUPDATE_"];
+        }
+        return self.db[step].save_raw(id, obj_new);
       })
       .catch(function (err) {
         console.error(err);
         obj_new = {}
         obj_new[local_id] = obj;
-        obj_new["_LASTUPDATE_"] = ts
-        obj_new["_CREATED_"] = ts
+        obj_new["_LASTUPDATE_"] = obj["_LASTUPDATE_"]
+        obj_new["_CREATED_"] = obj["CREATED"]
         self.audit.log("new item:" + id, ts.slice(0,10).replace(/-/g,''))
-        return self.db[step].save_raw(id, obj_new)
+        return self.db[step].save_raw(id, obj_new);
       })
     } // end else
   }
