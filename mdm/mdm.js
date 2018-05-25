@@ -121,7 +121,11 @@ class Mdm {
         obj_new[local_id] = obj;
         obj_new["_LASTUPDATE_"] = obj["_LASTUPDATE_"]
         obj_new["_CREATED_"] = obj["CREATED"]
-        self.audit.log("new item:" + id, ts.slice(0,10).replace(/-/g,''))
+        let ts = obj["CREATED"];
+        if (ts == null) {
+          ts = new Date().toJSON()
+        }
+        self.audit.log("new item:" + id, ts.replace(/-/g,''))
         return self.db[step].save_raw(id, obj_new);
       })
     } // end else
@@ -131,6 +135,10 @@ class Mdm {
     var self = this;
     var obj_new = obj;
     const step = "merge"
+    const created = obj["_CREATED_"];
+    const lastupdate = obj["_LATUPDATE_"];
+    delete obj["_CREATED_"];
+    delete obj["_LATUPDATE_"]
     let skip_keys = self.settings.steps[step].keys[0]
     let objList = Object.values(obj)
     console.debug("step merge: input is " + JSON.stringify(obj))
@@ -139,6 +147,8 @@ class Mdm {
       console.error("Step " + step + ": missing ID keys in doc " + obj)
     } else {
       let obj_new = obj_utils.merge_objects(objList, skip_keys, self.settings.mdm.source_system_key, {})
+      obj_new["_CREATED_"] = created;
+      obj_new["_LATUPDATE_"] = lastupdate;
       return this.db[step].save_raw(id, obj_new)
     }
   }
