@@ -99,7 +99,6 @@ class Mdm {
     var self = this;
     obj = obj_utils.normalize(obj, self.settings.steps[step].rules)
     this.audit.save_new_values(obj)
-    var obj_new = {}
     let local_id = obj[self.settings.mdm.source_system_key]
     const id = this.get_document_id(obj, step)
     if (! id) {
@@ -117,15 +116,15 @@ class Mdm {
       })
       .catch(function (err) {
         console.error(err);
-        obj_new = {}
+        var obj_new = {}
         obj_new[local_id] = obj;
         obj_new["_LASTUPDATE_"] = obj["_LASTUPDATE_"]
-        obj_new["_CREATED_"] = obj["CREATED"]
-        let ts = obj["CREATED"];
+        obj_new["_CREATED_"] = obj["_CREATED_"]
+        let ts = obj["_CREATED_"];
         if (ts == null) {
           ts = new Date().toJSON()
         }
-        self.audit.log("new item:" + id, ts.replace(/-/g,''))
+        self.audit.log("new item:" + id, ts)
         return self.db[step].save_raw(id, obj_new);
       })
     } // end else

@@ -42,7 +42,10 @@ class Audit {
   }
 
   log(text, day) {
-    const key = '_LOG_' + day // new Date().toJSON().slice(0,10).replace(/-/g,'');
+    if (day == null) {
+      day = new Date().toJSON();
+    }
+    const key = '_LOG_' + day.replace(/-/g,'').slice(0,8);  // new Date().toJSON().slice(0,10).replace(/-/g,'');
     return this.db.save_raw_push(key, text, false)
   }
 
