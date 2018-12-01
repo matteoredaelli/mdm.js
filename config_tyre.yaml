@@ -143,7 +143,7 @@ steps:
           keys: /^indice di velocità$/i
         action:
           command: keys_replace
-          param1: speed_index
+          param1: speed_indexhttps://moleculer.services/
       - filter:
           keys: /^indice di portanza$/i
         action:

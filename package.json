@@ -16,7 +16,9 @@
     "jade": "~1.11",
     "js-yaml": "^3.10",
     "level": "^3.0.0",
-    "morgan": "~1.9.0",
+    "level-rocksdb": "^3.0.1",
+    "mongodb": "^3.1.10",
+    "morgan": "^1.9.1",
     "serve-favicon": "~2.4.5"
   }
 }
