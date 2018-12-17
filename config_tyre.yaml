@@ -206,19 +206,13 @@ steps:
             command: values_replace
             param1: null
         - filter:
-            keys: /^brand$/i
-            values: /[-_]/i
-          action:
-            command: values_replace
-            param1: ' '
-        - filter:
             keys: /^label_noise$/i
             values: / ?db$/i
           action:
             command: values_replace
             param1: ''
         - filter:
-            keys: /^seasonality$/i
+            keys: /season|description/i
             values: /WINTER|INVERNAL|M\+S|SNOW|KITKARENGAS|NASTARENGAS|Zimné/i
           action:
             command: values_replace

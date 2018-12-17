@@ -17,13 +17,8 @@
 
 "use strict";
 
-const level = require('level')
+const level = require('level-rocksdb')
 var fs = require('fs')
-
-//db.put('example', {"a": 42}, function (err) {
-
-
-//})
 
 class DB{
   constructor(path, dbname) {
@@ -55,31 +50,31 @@ class DB{
 
 
   save_raw_if_new(id, doc) {
-      var self = this
-      this.db.get(id)
-        .then(function (obj) {
-          console.log(self.dbdesc + "save_raw_if_new: altrady exixts, not saving")
-        })
-        .catch(function (err) {
-          console.error(err);
-          return self.save_raw(id, doc)
-        })
+    var self = this
+    this.db.get(id)
+    .then(function (obj) {
+      console.log(self.dbdesc + "save_raw_if_new: altrady exixts, not saving")
+    })
+    .catch(function (err) {
+      console.error(err);
+      return self.save_raw(id, doc)
+    })
   }
 
   save_raw_push(id, doc, uniq=true) {
-      var self = this
-      this.db.get(id)
-        .then(function (obj) {
-          if ( !uniq || (! obj.includes(doc)) ) {
-            obj.push(doc);
-            return self.save_raw(id, obj)
-          }
-        })
-        .catch(function (err) {
-          console.error(err);
-          return self.save_raw(id, [doc])
-        })
-    }
+    var self = this
+    this.db.get(id)
+    .then(function (obj) {
+      if ( !uniq || (! obj.includes(doc)) ) {
+        obj.push(doc);
+        return self.save_raw(id, obj)
+      }
+    })
+    .catch(function (err) {
+      console.error(err);
+      return self.save_raw(id, [doc])
+    })
+  }
 
   load_raw(id) {
     console.debug(this.dbdesc + "load_raw: with id=" + id)
@@ -92,8 +87,8 @@ class DB{
     //   return {} })
 
     return this.db.get(id);
-      //.then(function (value) { callback(value) })
-      //.catch(function (err) { console.error(err) })
+    //.then(function (value) { callback(value) })
+    //.catch(function (err) { console.error(err) })
   }
 
 
@@ -105,17 +100,17 @@ class DB{
     }
     console.debug(self.dbdesc + "save_obj: with id=" + id + ' and import_id=' + import_id)
     this.db.get(id)
-      .then(function (obj) {
-        console.log(self.dbdesc + "save_obj: retreived object ")
-        console.log(obj)
-        obj[import_id] = doc;
-        return self.save_raw(id, obj)
-      })
-      .catch(function (err) {
-        console.error(err);
-        obj[import_id] = doc;
-        return self.save_raw(id, obj)
-      })
+    .then(function (obj) {
+      console.log(self.dbdesc + "save_obj: retreived object ")
+      console.log(obj)
+      obj[import_id] = doc;
+      return self.save_raw(id, obj)
+    })
+    .catch(function (err) {
+      console.error(err);
+      obj[import_id] = doc;
+      return self.save_raw(id, obj)
+    })
   }
 
   load_obj(id) {
@@ -128,12 +123,12 @@ class DB{
     this.db.createKeyStream()
     .on('data', function (data) {
       console.debug(self.dbdesc +  'deleting key=', data)
-        self.db.del(data, function (err) {
-          if (err) {
-            console.debug(self.dbdesc +  'cannot delete key=', data)
-          }
-        });
-      }) //data
+      self.db.del(data, function (err) {
+        if (err) {
+          console.debug(self.dbdesc +  'cannot delete key=', data)
+        }
+      });
+    }) //data
   }
 
   count(callback) {
